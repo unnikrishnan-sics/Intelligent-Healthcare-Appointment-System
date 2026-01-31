@@ -11,6 +11,7 @@ const DashboardHome = () => {
     const { theme } = useTheme();
     const navigate = useNavigate();
     const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+    const [stats, setStats] = useState({ patients: 0, doctors: 0, appointments: 0 });
 
     useEffect(() => {
         const fetchDashboardData = async () => {
