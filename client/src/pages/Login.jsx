@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, LogIn, ChevronRight } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -20,7 +21,9 @@ const Login = () => {
             await login(email, password);
             navigate('/dashboard');
         } catch (err) {
-            setError(err.response?.data?.message || 'Invalid credentials. Please try again.');
+            const msg = err.response?.data?.message || 'Invalid credentials. Please try again.';
+            setError(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }

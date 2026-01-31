@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './context/AuthContext';
 import MainLayout from './components/layout/MainLayout';
@@ -58,6 +59,7 @@ function App() {
 
               <Route path="/unauthorized" element={<div className="p-10 text-center text-red-500">Unauthorized Access</div>} />
             </Routes>
+            <Toaster position="top-right" reverseOrder={false} />
           </div>
         </Router>
       </AuthProvider>

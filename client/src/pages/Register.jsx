@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Briefcase, ChevronRight, Stethoscope, MapPin } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -36,13 +37,16 @@ const Register = () => {
             const data = await register(formData.name, formData.email, formData.password, formData.role);
 
             if (data?.status === 'pending') {
-                alert('Registration successful! Please wait for Admin approval before logging in.');
+                toast.success('Registration successful! Please wait for Admin approval.');
                 navigate('/login');
             } else {
+                toast.success('Account created successfully!');
                 navigate('/dashboard');
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed. Please try again.');
+            const msg = err.response?.data?.message || 'Registration failed.';
+            setError(msg);
+            toast.error(msg);
         } finally {
             setLoading(false);
         }

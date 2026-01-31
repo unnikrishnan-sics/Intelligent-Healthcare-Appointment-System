@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import { useTheme } from '../../context/ThemeContext';
 import { CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const CheckoutForm = ({ clientSecret, onSuccess, amount, doctorName }) => {
     const stripe = useStripe();
     const elements = useElements();
     const { theme } = useTheme();
 
-    const [message, setMessage] = useState(null);
+
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -33,15 +34,15 @@ const CheckoutForm = ({ clientSecret, onSuccess, amount, doctorName }) => {
         });
 
         if (error) {
-            setMessage(error.message);
+            toast.error(error.message);
             setIsLoading(false);
         } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-            setMessage("Payment Successful!");
+            toast.success("Payment Successful!");
             onSuccess(paymentIntent.id);
             // Don't set loading false yet, wait for parent to handle success
         } else {
             setIsLoading(false);
-            setMessage("Payment status: " + paymentIntent.status);
+            toast.error("Payment status: " + paymentIntent.status);
         }
     };
 
@@ -70,12 +71,7 @@ const CheckoutForm = ({ clientSecret, onSuccess, amount, doctorName }) => {
                 <PaymentElement />
             </div>
 
-            {message && (
-                <div className={`p-3 rounded-lg mb-4 text-sm ${message === "Payment Successful!" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                    {message === "Payment Successful!" && <CheckCircle className="inline w-4 h-4 mr-1" />}
-                    {message}
-                </div>
-            )}
+
 
             <button
                 disabled={isLoading || !stripe || !elements}

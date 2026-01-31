@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { UserPlus, User, Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const ManageDoctors = () => {
     const [doctors, setDoctors] = useState([]);
@@ -39,9 +40,10 @@ const ManageDoctors = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchDoctors(); // Refresh list
+            toast.success('Doctor status updated successfully');
         } catch (err) {
             console.error('Error updating status:', err);
-            alert('Failed to update status');
+            toast.error('Failed to update status');
         }
     };
 

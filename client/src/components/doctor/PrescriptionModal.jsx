@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { XCircle, Plus, Trash2, Save, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const PrescriptionModal = ({ appointment, onClose, onSuccess }) => {
     const [medicines, setMedicines] = useState([{ name: '', dosage: '', frequency: '', duration: '' }]);
@@ -68,12 +69,12 @@ const PrescriptionModal = ({ appointment, onClose, onSuccess }) => {
                 notes
             }, config);
 
-            alert('Prescription added successfully!');
+            toast.success('Prescription added successfully!');
             onSuccess();
             onClose();
         } catch (error) {
             console.error(error);
-            alert(error.response?.data?.message || 'Failed to add prescription');
+            toast.error(error.response?.data?.message || 'Failed to add prescription');
         } finally {
             setLoading(false);
         }

@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, FileText } from 'lucide-react';
 import PrescriptionModal from '../../components/doctor/PrescriptionModal';
+import toast from 'react-hot-toast';
 
 const Appointments = () => {
     const [appointments, setAppointments] = useState([]);
@@ -38,11 +39,12 @@ const Appointments = () => {
             await axios.put(`${import.meta.env.VITE_API_URL}/api/appointments/${id}/status`, { status: newStatus }, config);
 
             // Optimistic update or refetch
+            // Optimistic update or refetch
             fetchAppointments();
-            alert(`Appointment marked as ${newStatus}`);
+            toast.success(`Appointment marked as ${newStatus}`);
         } catch (error) {
             console.error("Error updating status", error);
-            alert(error.response?.data?.message || "Failed to update status");
+            toast.error(error.response?.data?.message || "Failed to update status");
         }
     };
 
