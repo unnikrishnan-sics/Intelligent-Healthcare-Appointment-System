@@ -6,7 +6,8 @@ const connectDB = require('./config/db');
 dotenv.config();
 
 // Connect Database
-connectDB();
+// Connect Database (Serverless: Call inside middleware or functions)
+// connectDB(); // Removed top-level call
 
 const app = express();
 
@@ -21,6 +22,12 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options(/.*/, cors(corsOptions)); // Enable pre-flight for all routes
 app.use(express.json());
+
+// DB Connection Middleware
+app.use(async (req, res, next) => {
+    await connectDB();
+    next();
+});
 
 // Routes
 app.get('/', (req, res) => {
