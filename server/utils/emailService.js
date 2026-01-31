@@ -72,8 +72,27 @@ const sendReminder = async (user, appointment) => {
     return sendEmail({ to: user.email, subject, html });
 };
 
+const sendPasswordReset = async (user, resetUrl) => {
+    const subject = 'Password Reset Request';
+    const html = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #2563eb;">Reset Your Password</h2>
+            <p>Dear <strong>${user.name}</strong>,</p>
+            <p>You requested a password reset. Please click the button below to set a new password:</p>
+            
+            <a href="${resetUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 20px 0;">Reset Password</a>
+            
+            <p>If you did not request this, please ignore this email.</p>
+            <p><small>This link expires in 10 minutes.</small></p>
+        </div>
+    `;
+
+    return sendEmail({ to: user.email, subject, html });
+};
+
 module.exports = {
     sendEmail,
     sendBookingReceipt,
-    sendReminder
+    sendReminder,
+    sendPasswordReset
 };

@@ -8,6 +8,8 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import DashboardHome from './pages/DashboardHome';
 import DoctorList from './pages/patient/DoctorList';
 import Appointments from './pages/common/Appointments';
@@ -38,6 +40,8 @@ function App() {
                 <Route path="/doctors" element={<DoctorList />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password/:resetToken" element={<ResetPassword />} />
               </Route>
 
               {/* Protected Dashboard Routes */}
