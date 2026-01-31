@@ -26,6 +26,7 @@ app.use(express.json());
 // DB Connection Middleware
 app.use(async (req, res, next) => {
     await connectDB();
+    await seedAdmin(); // Run seed check (safe due to internal caching)
     next();
 });
 

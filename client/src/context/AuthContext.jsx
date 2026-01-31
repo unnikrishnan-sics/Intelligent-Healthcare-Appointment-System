@@ -41,8 +41,8 @@ export const AuthProvider = ({ children }) => {
         return res.data;
     };
 
-    const register = async (name, email, password, role) => {
-        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, { name, email, password, role });
+    const register = async (name, email, password, role, address) => {
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, { name, email, password, role, address });
 
         if (res.data.token) {
             localStorage.setItem('token', res.data.token);
