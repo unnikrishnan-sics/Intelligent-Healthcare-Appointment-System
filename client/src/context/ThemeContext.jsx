@@ -28,7 +28,7 @@ export const ThemeProvider = ({ children }) => {
         const fetchSettings = async () => {
             try {
                 // Mock fetch or real fetch
-                // const res = await axios.get('http://localhost:5000/api/admin/settings');
+                // const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/settings`);
                 // if(res.data) {
                 //      setTheme(res.data.theme);
                 //      applyTheme(res.data.theme);

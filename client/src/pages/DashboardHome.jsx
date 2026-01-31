@@ -19,10 +19,10 @@ const DashboardHome = () => {
 
             try {
                 if (user.role === 'admin') {
-                    const res = await axios.get('http://localhost:5000/api/admin/stats', config);
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/stats`, config);
                     setStats(res.data);
                 } else if (user.role === 'patient') {
-                    const res = await axios.get('http://localhost:5000/api/appointments/my', config);
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/appointments/my`, config);
                     // Filter for future appointments (Confirmed or Pending)
                     const upcoming = res.data
                         .filter(apt => new Date(apt.date) >= new Date().setHours(0, 0, 0, 0) && (apt.status === 'Confirmed' || apt.status === 'Pending'))

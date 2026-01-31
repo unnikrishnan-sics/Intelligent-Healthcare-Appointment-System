@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
                     // Configure axios default
                     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                     // Verify token or get profile
-                    // const res = await axios.get('http://localhost:5000/api/auth/profile');
+                    // const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/profile`);
                     // setUser(res.data);
 
                     // Simple decode or just assume valid for now if backend check fails due to cors/network in split terminal
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (email, password) => {
-        const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/login`, { email, password });
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('userInfo', JSON.stringify(res.data));
         axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const register = async (name, email, password, role) => {
-        const res = await axios.post('http://localhost:5000/api/auth/register', { name, email, password, role });
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, { name, email, password, role });
 
         if (res.data.token) {
             localStorage.setItem('token', res.data.token);

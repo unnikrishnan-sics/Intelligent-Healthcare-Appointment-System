@@ -14,7 +14,7 @@ const LiveQueue = () => {
                 // Fetch all doctors. 
                 // Note: ideally we might want a lighter endpoint, but getDoctors works 
                 // as it returns the full doc object including queueState.
-                const res = await axios.get('http://localhost:5000/api/doctors');
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/doctors`);
                 setDoctors(res.data);
                 setLoading(false);
             } catch (error) {

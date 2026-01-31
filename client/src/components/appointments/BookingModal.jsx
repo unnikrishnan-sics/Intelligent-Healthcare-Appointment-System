@@ -54,7 +54,7 @@ const BookingModal = ({ doctor, isOpen, onClose }) => {
 
         try {
             const token = localStorage.getItem('token');
-            const { data } = await axios.post('http://localhost:5000/api/appointments', {
+            const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/appointments`, {
                 doctorId: doctor.userId._id,
                 date,
                 timeSlot: selectedSlot,
@@ -84,7 +84,7 @@ const BookingModal = ({ doctor, isOpen, onClose }) => {
         try {
             const token = localStorage.getItem('token');
             // Notify Backend
-            await axios.post('http://localhost:5000/api/appointments/verify-payment', {
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/appointments/verify-payment`, {
                 paymentIntentId,
                 appointmentId
             }, {

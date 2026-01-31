@@ -17,7 +17,7 @@ const ManageDoctors = () => {
             const config = {
                 headers: { Authorization: `Bearer ${token}` }
             };
-            const res = await axios.get('http://localhost:5000/api/admin/users', config);
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/users`, config);
             // Filter only doctors
             const allDoctors = res.data.filter(u => u.role === 'doctor');
             setDoctors(allDoctors);
@@ -35,7 +35,7 @@ const ManageDoctors = () => {
     const handleStatusUpdate = async (id, status) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/api/admin/users/${id}/status`, { status }, {
+            await axios.put(`${import.meta.env.VITE_API_URL}/api/admin/users/${id}/status`, { status }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchDoctors(); // Refresh list

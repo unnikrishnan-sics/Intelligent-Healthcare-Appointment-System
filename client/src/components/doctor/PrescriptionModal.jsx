@@ -17,7 +17,7 @@ const PrescriptionModal = ({ appointment, onClose, onSuccess }) => {
                 try {
                     const token = localStorage.getItem('token');
                     const config = { headers: { Authorization: `Bearer ${token}` } };
-                    const res = await axios.get(`http://localhost:5000/api/prescriptions/${appointment._id}`, config);
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/prescriptions/${appointment._id}`, config);
                     if (res.data) {
                         setMedicines(res.data.medicines);
                         setNotes(res.data.notes);
@@ -61,7 +61,7 @@ const PrescriptionModal = ({ appointment, onClose, onSuccess }) => {
             const token = localStorage.getItem('token');
             const config = { headers: { Authorization: `Bearer ${token}` } };
 
-            await axios.post('http://localhost:5000/api/prescriptions', {
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/prescriptions`, {
                 appointmentId: appointment._id,
                 patientId: appointment.patientId._id || appointment.patientId,
                 medicines,

@@ -14,7 +14,7 @@ const DoctorPatients = () => {
             try {
                 const token = localStorage.getItem('token');
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                const res = await axios.get('http://localhost:5000/api/doctors/patients', config);
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/doctors/patients`, config);
                 setPatients(res.data);
                 setLoading(false);
             } catch (error) {
@@ -36,7 +36,7 @@ const DoctorPatients = () => {
                 setLoadingHistory(true);
                 try {
                     const token = localStorage.getItem('token');
-                    const res = await axios.get(`http://localhost:5000/api/doctors/patients/${selectedPatient._id}/history`, {
+                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/doctors/patients/${selectedPatient._id}/history`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     setHistory(res.data);

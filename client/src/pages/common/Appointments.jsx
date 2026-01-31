@@ -16,7 +16,7 @@ const Appointments = () => {
         try {
             const token = localStorage.getItem('token');
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            const res = await axios.get('http://localhost:5000/api/appointments/my', config);
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/appointments/my`, config);
             setAppointments(res.data);
             setLoading(false);
         } catch (error) {
@@ -35,7 +35,7 @@ const Appointments = () => {
         try {
             const token = localStorage.getItem('token');
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            await axios.put(`http://localhost:5000/api/appointments/${id}/status`, { status: newStatus }, config);
+            await axios.put(`${import.meta.env.VITE_API_URL}/api/appointments/${id}/status`, { status: newStatus }, config);
 
             // Optimistic update or refetch
             fetchAppointments();

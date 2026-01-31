@@ -19,7 +19,7 @@ const AdminAppointments = () => {
         try {
             const token = localStorage.getItem('token');
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            const res = await axios.get('http://localhost:5000/api/appointments/admin/all', config);
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/appointments/admin/all`, config);
             setAppointments(res.data);
             setLoading(false);
         } catch (error) {

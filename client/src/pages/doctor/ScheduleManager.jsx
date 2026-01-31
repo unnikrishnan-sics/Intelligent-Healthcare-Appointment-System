@@ -20,7 +20,7 @@ const ScheduleManager = () => {
             try {
                 const token = localStorage.getItem('token');
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                const res = await axios.get('http://localhost:5000/api/doctors/profile', config);
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/doctors/profile`, config);
                 if (res.data) {
                     if (res.data.availability) {
                         setSchedule(res.data.availability);
@@ -75,7 +75,7 @@ const ScheduleManager = () => {
                 availability: schedule
             };
 
-            await axios.post('http://localhost:5000/api/doctors/profile', payload, config);
+            await axios.post(`${import.meta.env.VITE_API_URL}/api/doctors/profile`, payload, config);
 
             setMessage('Profile and schedule updated successfully!');
             setTimeout(() => setMessage(''), 3000);

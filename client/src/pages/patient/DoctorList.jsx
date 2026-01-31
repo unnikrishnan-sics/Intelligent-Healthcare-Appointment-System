@@ -14,7 +14,7 @@ const DoctorList = () => {
     useEffect(() => {
         const fetchDoctors = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/doctors');
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/doctors`);
                 setDoctors(res.data);
                 setLoading(false);
             } catch (error) {

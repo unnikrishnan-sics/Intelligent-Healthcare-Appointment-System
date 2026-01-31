@@ -27,7 +27,7 @@ const Profile = () => {
         try {
             const token = localStorage.getItem('token');
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            const { data } = await axios.get('http://localhost:5000/api/auth/profile', config);
+            const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/profile`, config);
 
             setFormData(prev => ({
                 ...prev,
@@ -74,7 +74,7 @@ const Profile = () => {
                 updateData.password = formData.password;
             }
 
-            const { data } = await axios.put('http://localhost:5000/api/auth/profile', updateData, config);
+            const { data } = await axios.put(`${import.meta.env.VITE_API_URL}/api/auth/profile`, updateData, config);
 
             setMessage('Profile updated successfully!');
             // Ideally update context user here if needed, but for now local state is enough for this page.

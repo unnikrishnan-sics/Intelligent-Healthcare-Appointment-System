@@ -16,7 +16,7 @@ const DoctorQueuePanel = ({ user }) => {
         try {
             setLoading(true);
             const token = localStorage.getItem('token');
-            const res = await axios.get(`http://localhost:5000/api/queue/${user._id}`, {
+            const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/queue/${user._id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setQueue(res.data.queue);
@@ -38,7 +38,7 @@ const DoctorQueuePanel = ({ user }) => {
         try {
             setActionLoading(true);
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/api/queue/${endpoint}`, payload, {
+            await axios.put(`${import.meta.env.VITE_API_URL}/api/queue/${endpoint}`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchQueue(); // Refresh immediately
