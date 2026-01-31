@@ -74,7 +74,8 @@ const appointmentSchema = new mongoose.Schema({
         default: 'Pending'
     },
     razorpayOrderId: { type: String },
-    razorpayPaymentId: { type: String }
+    razorpayPaymentId: { type: String },
+    reminded: { type: Boolean, default: false }
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }

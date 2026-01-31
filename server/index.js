@@ -46,9 +46,12 @@ app.use('/api/queue', require('./routes/queueRoutes')); // Queue Routes
 const PORT = process.env.PORT || 5000;
 
 const seedAdmin = require('./scripts/seedAdmin');
+const startReminderJob = require('./cron/reminderCron');
+
 app.listen(PORT, () => {
     console.log(`Server started on port ${PORT}`);
     seedAdmin(); // Auto-seed on local startup
+    startReminderJob(); // Start Cron Job
 });
 
 module.exports = app;

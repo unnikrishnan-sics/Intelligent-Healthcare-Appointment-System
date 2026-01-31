@@ -2,6 +2,7 @@ const Appointment = require('../models/Appointment');
 const Doctor = require('../models/Doctor');
 const User = require('../models/User');
 const { calculateNoShowRisk } = require('../utils/predictionService');
+const { sendBookingReceipt } = require('../utils/emailService');
 
 // Initialize Stripe
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -100,6 +101,10 @@ const bookAppointment = async (req, res) => {
             }
         });
 
+        const { sendBookingReceipt } = require('../utils/emailService');
+
+        // ... (in bookAppointment)
+
         const appointment = await Appointment.create({
             patientId: req.user.id,
             doctorId,
@@ -114,6 +119,9 @@ const bookAppointment = async (req, res) => {
             predictionScore: prediction.score,
             riskFactors: prediction.factors
         });
+
+        // Send Email Receipt (Async - don't block response)
+        sendBookingReceipt(req.user, appointment).catch(err => console.error("Email Error:", err));
 
         res.status(201).json({
             appointment,
