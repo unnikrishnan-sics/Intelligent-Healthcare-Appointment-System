@@ -11,7 +11,10 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: ['https://ihasfrontend.vercel.app', 'http://localhost:5173', 'http://localhost:5000'],
+    credentials: true
+}));
 app.use(express.json());
 
 // Routes
