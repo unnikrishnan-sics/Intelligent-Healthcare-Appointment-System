@@ -44,6 +44,10 @@ app.use('/api/queue', require('./routes/queueRoutes')); // Queue Routes
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+const seedAdmin = require('./scripts/seedAdmin');
+app.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`);
+    seedAdmin(); // Auto-seed on local startup
+});
 
 module.exports = app;
