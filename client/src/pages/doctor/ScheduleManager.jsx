@@ -34,6 +34,7 @@ const ScheduleManager = () => {
                 }
             } catch (error) {
                 console.error('Error fetching profile:', error);
+                setMessage(error.response?.data?.message || 'Failed to load profile data');
             } finally {
                 setLoading(false);
             }
@@ -70,6 +71,13 @@ const ScheduleManager = () => {
                 return;
             }
 
+            // Validation: Specialization should not contain numbers
+            const specializationRegex = /^[a-zA-Z\s\-\&]+$/;
+            if (!specializationRegex.test(profileData.specialization)) {
+                setMessage('Specialization should only contain letters, spaces, and hyphens');
+                return;
+            }
+
             const payload = {
                 ...profileData,
                 availability: schedule
@@ -102,10 +110,15 @@ const ScheduleManager = () => {
                             name="specialization"
                             value={profileData.specialization}
                             onChange={handleProfileChange}
-                            className="mt-1 block w-full border rounded-md p-2"
+                            className={`mt-1 block w-full border rounded-md p-2 ${profileData.specialization && !/^[a-zA-Z\s\-\&]+$/.test(profileData.specialization) ? 'border-red-500 bg-red-50' : ''}`}
                             placeholder="e.g. Cardiologist"
+                            pattern="^[a-zA-Z\s\-\&]+$"
+                            title="Specialization should only contain letters, spaces, and hyphens"
                             required
                         />
+                        {profileData.specialization && !/^[a-zA-Z\s\-\&]+$/.test(profileData.specialization) && (
+                            <p className="text-xs text-red-500 mt-1">Specialization should only contain letters, spaces, and hyphens</p>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Experience (Years)</label>
@@ -120,7 +133,7 @@ const ScheduleManager = () => {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Consulation Fees ($)</label>
+                        <label className="block text-sm font-medium text-gray-700">Consultation Fees ($)</label>
                         <input
                             type="number"
                             name="feesPerConsultation"
@@ -158,7 +171,17 @@ const ScheduleManager = () => {
                     </button>
                 </div>
 
-                {message && <div className={`p-3 rounded mb-4 ${message.includes('Failed') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>{message}</div>}
+                {message && (
+                    <div className={`p-3 rounded mb-4 ${message.toLowerCase().includes('failed') ||
+                            message.toLowerCase().includes('error') ||
+                            message.toLowerCase().includes('authorized') ||
+                            message.toLowerCase().includes('token')
+                            ? 'bg-red-100 text-red-700 border border-red-200'
+                            : 'bg-green-100 text-green-700 border border-green-200'
+                        }`}>
+                        {message}
+                    </div>
+                )}
 
                 <div className="space-y-4">
                     {schedule.length === 0 && <p className="text-gray-500 italic">No availability slots set.</p>}

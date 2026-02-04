@@ -8,7 +8,11 @@ const doctorSchema = new mongoose.Schema({
     },
     specialization: {
         type: String,
-        required: [true, 'Please add specialization']
+        required: [true, 'Please add specialization'],
+        match: [
+            /^[a-zA-Z\s\-\&]+$/,
+            'Specialization should only contain letters, spaces, and hyphens'
+        ]
     },
     bio: {
         type: String,

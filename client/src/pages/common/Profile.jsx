@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext'; // adjust path if needed
 import { useTheme } from '../../context/ThemeContext'; // adjust path if needed
-import { User, Mail, MapPin, Lock, Save, AlertCircle, CheckCircle } from 'lucide-react';
+import { User, Mail, MapPin, Lock, Save, AlertCircle, CheckCircle, Eye, EyeOff } from 'lucide-react';
 
 const Profile = () => {
     const { user, login } = useAuth(); // capable of updating user context if login returns updated user or we re-fetch
@@ -12,12 +12,16 @@ const Profile = () => {
         name: '',
         email: '',
         address: '',
+        currentPassword: '',
         password: '',
         confirmPassword: ''
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState(null);
     const [error, setError] = useState(null);
+    const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     useEffect(() => {
         fetchProfile();
@@ -26,20 +30,28 @@ const Profile = () => {
     const fetchProfile = async () => {
         try {
             const token = localStorage.getItem('token');
+            if (!token) {
+                setError('No authentication token found. Please login again.');
+                return;
+            }
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth/profile`, config);
+            const apiUrl = `${import.meta.env.VITE_API_URL}/api/auth/profile`;
+            console.log('Fetching profile from:', apiUrl);
+
+            const { data } = await axios.get(apiUrl, config);
 
             setFormData(prev => ({
                 ...prev,
                 name: data.name || '',
                 email: data.email || '',
                 address: data.address || '',
+                currentPassword: '',
                 password: '',
                 confirmPassword: ''
             }));
         } catch (err) {
-            setError('Failed to load profile.');
-            console.error(err);
+            console.error('Profile fetch error:', err);
+            setError(err.response?.data?.message || 'Failed to load profile.');
         }
     };
 
@@ -72,17 +84,19 @@ const Profile = () => {
             };
             if (formData.password) {
                 updateData.password = formData.password;
+                updateData.currentPassword = formData.currentPassword;
             }
 
             const { data } = await axios.put(`${import.meta.env.VITE_API_URL}/api/auth/profile`, updateData, config);
 
             setMessage('Profile updated successfully!');
+            setTimeout(() => setMessage(null), 3000);
             // Ideally update context user here if needed, but for now local state is enough for this page.
             // If the AuthContext had a setUser, we would call it.
             // Since we don't know exact AuthContext structure for update, we'll rely on current page state.
 
             // Clear password fields
-            setFormData(prev => ({ ...prev, password: '', confirmPassword: '' }));
+            setFormData(prev => ({ ...prev, currentPassword: '', password: '', confirmPassword: '' }));
 
         } catch (err) {
             console.error(err);
@@ -163,20 +177,49 @@ const Profile = () => {
 
                     <div className="border-t pt-6">
                         <h3 className="text-lg font-semibold mb-4 text-gray-800">Change Password</h3>
+                        <div className="mb-6">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Current Password</label>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                                <input
+                                    type={showCurrentPassword ? "text" : "password"}
+                                    name="currentPassword"
+                                    value={formData.currentPassword}
+                                    onChange={handleChange}
+                                    placeholder="Enter current password"
+                                    className="w-full pl-10 pr-12 py-2 border rounded-lg focus:ring-2 focus:outline-none"
+                                    style={{ '--tw-ring-color': theme.primaryColor }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                >
+                                    {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
                                 <div className="relative">
                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                     <input
-                                        type="password"
+                                        type={showPassword ? "text" : "password"}
                                         name="password"
                                         value={formData.password}
                                         onChange={handleChange}
                                         placeholder="Min 6 characters"
-                                        className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:outline-none"
+                                        className="w-full pl-10 pr-12 py-2 border rounded-lg focus:ring-2 focus:outline-none"
                                         style={{ '--tw-ring-color': theme.primaryColor }}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
                                 </div>
                             </div>
                             <div>
@@ -184,14 +227,21 @@ const Profile = () => {
                                 <div className="relative">
                                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                                     <input
-                                        type="password"
+                                        type={showConfirmPassword ? "text" : "password"}
                                         name="confirmPassword"
                                         value={formData.confirmPassword}
                                         onChange={handleChange}
                                         placeholder="Re-enter password"
-                                        className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:outline-none"
+                                        className="w-full pl-10 pr-12 py-2 border rounded-lg focus:ring-2 focus:outline-none"
                                         style={{ '--tw-ring-color': theme.primaryColor }}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                    >
+                                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
                                 </div>
                             </div>
                         </div>

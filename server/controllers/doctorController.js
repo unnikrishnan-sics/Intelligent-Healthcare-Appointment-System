@@ -10,20 +10,26 @@ const getDoctors = async (req, res) => {
         const today = new Date().toISOString().split('T')[0];
         const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
-        const doctors = await Doctor.aggregate([
+        const doctors = await User.aggregate([
             {
-                $lookup: {
-                    from: 'users',
-                    localField: 'userId',
-                    foreignField: '_id',
-                    as: 'user'
+                $match: {
+                    role: 'doctor',
+                    status: 'active'
                 }
             },
-            { $unwind: '$user' },
+            {
+                $lookup: {
+                    from: 'doctors',
+                    localField: '_id',
+                    foreignField: 'userId',
+                    as: 'profile'
+                }
+            },
+            { $unwind: { path: '$profile', preserveNullAndEmptyArrays: true } },
             {
                 $lookup: {
                     from: 'appointments',
-                    let: { doctorId: '$userId' },
+                    let: { doctorId: '$_id' },
                     pipeline: [
                         {
                             $match: {
@@ -31,7 +37,7 @@ const getDoctors = async (req, res) => {
                                     $and: [
                                         { $eq: ['$doctorId', '$$doctorId'] },
                                         { $eq: [{ $dateToString: { format: "%Y-%m-%d", date: "$date" } }, today] },
-                                        { $in: ['$status', ['Confirmed', 'Pending', 'Completed']] } // Include Completed to get total queue size
+                                        { $in: ['$status', ['Confirmed', 'Pending', 'Completed']] }
                                     ]
                                 }
                             }
@@ -40,13 +46,12 @@ const getDoctors = async (req, res) => {
                     as: 'todayAppointments'
                 }
             },
-            // Add lookup for the *current* active appointment to check if it's completed
             {
                 $lookup: {
                     from: 'appointments',
                     let: {
-                        doctorId: '$userId',
-                        lastToken: '$queueState.lastTokenCalled'
+                        doctorId: '$_id',
+                        lastToken: { $ifNull: ['$profile.queueState.lastTokenCalled', 0] }
                     },
                     pipeline: [
                         {
@@ -64,11 +69,10 @@ const getDoctors = async (req, res) => {
                     as: 'currentAppointment'
                 }
             },
-            // Lookup the REAL next patient based on Priority (Critical first)
             {
                 $lookup: {
                     from: 'appointments',
-                    let: { doctorId: '$userId' },
+                    let: { doctorId: '$_id' },
                     pipeline: [
                         {
                             $match: {
@@ -82,7 +86,6 @@ const getDoctors = async (req, res) => {
                                 }
                             }
                         },
-                        // Sort by Priority (Critical < Normal) then Token ID (Asc)
                         { $sort: { priority: 1, tokenNumber: 1 } },
                         { $limit: 1 }
                     ],
@@ -91,12 +94,23 @@ const getDoctors = async (req, res) => {
             },
             {
                 $addFields: {
-                    userId: '$user', // Restore original structure format
+                    userId: {
+                        _id: '$_id',
+                        name: '$name',
+                        email: '$email',
+                        role: '$role',
+                        status: '$status'
+                    },
+                    specialization: { $ifNull: ['$profile.specialization', 'General Specialist'] },
+                    bio: { $ifNull: ['$profile.bio', 'Professional healthcare provider.'] },
+                    experience: { $ifNull: ['$profile.experience', 0] },
+                    feesPerConsultation: { $ifNull: ['$profile.feesPerConsultation', 0] },
+                    availability: { $ifNull: ['$profile.availability', []] },
+                    queueState: { $ifNull: ['$profile.queueState', { isPaused: false, lastTokenCalled: 0 }] },
                     totalBookings: { $size: '$todayAppointments' },
                     isAvailableToday: {
-                        $in: [dayName, '$availability.day']
+                        $in: [dayName, { $ifNull: ['$profile.availability.day', []] }]
                     },
-                    // If lastTokenCalled > 0, check its status. If completed/skipped, currentStatus is 'Idle'
                     currentTokenStatus: {
                         $cond: {
                             if: { $gt: [{ $size: '$currentAppointment' }, 0] },
@@ -104,7 +118,6 @@ const getDoctors = async (req, res) => {
                             else: 'Idle'
                         }
                     },
-                    // Extract the calculated next token number (or null)
                     nextTokenNumber: {
                         $cond: {
                             if: { $gt: [{ $size: '$nextQueueItem' }, 0] },
@@ -116,10 +129,12 @@ const getDoctors = async (req, res) => {
             },
             {
                 $project: {
-                    user: 0,
+                    profile: 0,
                     todayAppointments: 0,
                     currentAppointment: 0,
-                    nextQueueItem: 0
+                    nextQueueItem: 0,
+                    password: 0,
+                    __v: 0
                 }
             }
         ]);
@@ -196,15 +211,19 @@ const updateDoctorProfile = async (req, res) => {
 // @access  Private (Doctor only)
 const getDoctorProfile = async (req, res) => {
     try {
+        console.log('getDoctorProfile - User from req:', req.user ? req.user._id : 'undefined');
         // Ensure user is authenticated (redundant if middleware works, but safe)
         if (!req.user) {
+            console.log('getDoctorProfile - No user on request');
             return res.status(401).json({ message: 'User not authenticated' });
         }
 
         const doctor = await Doctor.findOne({ userId: req.user._id });
         if (doctor) {
+            console.log('getDoctorProfile - Doctor found:', doctor._id);
             res.json(doctor);
         } else {
+            console.log('getDoctorProfile - No doctor profile found for user:', req.user._id);
             // Return empty profile or null instead of 404 to avoid console errors
             res.json(null);
         }

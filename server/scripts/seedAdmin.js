@@ -19,26 +19,25 @@ const seedAdmin = async () => {
         if (isSeeded) return;
 
         const adminExists = await User.findOne({ role: 'admin' });
-
-        if (adminExists) {
-            // Silently return if admin exists
-            isSeeded = true;
-            return;
-        }
-
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash('admin123', salt);
+        const hashedPassword = await bcrypt.hash('admin@123', salt);
 
-        await User.create({
+        const adminData = {
             name: 'System Admin',
-            email: 'admin@ihas.com',
+            email: 'admin@gmail.com',
             password: hashedPassword,
             role: 'admin',
             status: 'active',
             address: 'System HQ'
-        });
+        };
 
-        console.log('Seed: Default Admin created (admin@ihas.com).');
+        if (adminExists) {
+            await User.findByIdAndUpdate(adminExists._id, adminData);
+            console.log('Seed: Admin credentials updated (admin@gmail.com).');
+        } else {
+            await User.create(adminData);
+            console.log('Seed: Default Admin created (admin@gmail.com).');
+        }
         isSeeded = true;
     } catch (error) {
         console.error('Seed Error:', error.message);

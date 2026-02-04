@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Briefcase, ChevronRight, Stethoscope, MapPin } from 'lucide-react';
+import { User, Mail, Lock, Briefcase, ChevronRight, Stethoscope, MapPin, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Register = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+        address: '',
         password: '',
         role: 'patient'
     });
@@ -16,7 +17,7 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const { register } = useAuth();
     const { theme } = useTheme();
-    const navigate = useNavigate();
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -24,30 +25,19 @@ const Register = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            // The register function in context might likely auto-login if token is present
-            // We need to check what 'register' returns. 
-            // Looking at AuthContext (assumed), it likely sets user if token exists.
-
-            // Let's modify this to handle the response directly or check if login was successful.
-            // If we use the context function, it might throw if no token? 
-            // Or we should call the API directly here to control the flow better?
-            // Actually, best to update AuthContext to handle this, but let's check AuthContext first in next step if needed.
-            // For now, assuming register returns the data.
-
-            const data = await register(formData.name, formData.email, formData.password, formData.role);
+            const data = await register(formData.name, formData.email, formData.password, formData.role, formData.address);
 
             if (data?.status === 'pending') {
                 toast.success('Registration successful! Please wait for Admin approval.');
-                navigate('/login');
+                setTimeout(() => navigate('/login'), 2000);
             } else {
                 toast.success('Account created successfully!');
-                navigate('/dashboard');
+                setTimeout(() => navigate('/dashboard'), 2000);
             }
         } catch (err) {
             const msg = err.response?.data?.message || 'Registration failed.';
             setError(msg);
             toast.error(msg);
-        } finally {
             setLoading(false);
         }
     };
@@ -90,6 +80,7 @@ const Register = () => {
                                 <input
                                     type="text"
                                     name="name"
+                                    value={formData.name}
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all"
                                     style={{ '--tw-ring-color': theme.primaryColor }}
                                     placeholder="John Doe"
@@ -106,6 +97,7 @@ const Register = () => {
                                 <input
                                     type="email"
                                     name="email"
+                                    value={formData.email}
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all"
                                     style={{ '--tw-ring-color': theme.primaryColor }}
                                     placeholder="name@example.com"
@@ -122,6 +114,7 @@ const Register = () => {
                                 <input
                                     type="text"
                                     name="address"
+                                    value={formData.address}
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all"
                                     style={{ '--tw-ring-color': theme.primaryColor }}
                                     placeholder="123 Main St, City, Country"
@@ -136,14 +129,22 @@ const Register = () => {
                             <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                                 <input
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     name="password"
-                                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all"
+                                    value={formData.password}
+                                    className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:border-transparent transition-all"
                                     style={{ '--tw-ring-color': theme.primaryColor }}
                                     placeholder="••••••••"
                                     onChange={handleChange}
                                     required
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
                             </div>
                         </div>
 

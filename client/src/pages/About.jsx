@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { Award, Users, Heart, Shield } from 'lucide-react';
+import doctorInteraction from '../assets/doctor-interaction.png';
 
 const About = () => {
     const { theme } = useTheme();
@@ -42,7 +43,7 @@ const About = () => {
                         </p>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <img src="https://images.unsplash.com/photo-1584515933487-9d3005590ea2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Doctor" className="rounded-xl shadow-lg w-full h-48 object-cover transform translate-y-4" />
+                        <img src={doctorInteraction} alt="Doctor" className="rounded-xl shadow-lg w-full h-48 object-cover transform translate-y-4" />
                         <img src="https://images.unsplash.com/photo-1666214280557-f1b5022eb634?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Hospital" className="rounded-xl shadow-lg w-full h-48 object-cover transform -translate-y-4" />
                     </div>
                 </div>

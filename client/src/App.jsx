@@ -19,6 +19,7 @@ import LiveQueue from './pages/patient/LiveQueue';
 import ThemeSettings from './pages/admin/ThemeSettings';
 import ManageDoctors from './pages/admin/ManageDoctors';
 import AdminAppointments from './pages/admin/AdminAppointments';
+import Reports from './pages/admin/Reports';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Profile from './pages/common/Profile';
@@ -55,7 +56,7 @@ function App() {
                   <Route path="live-queue" element={<LiveQueue />} />
                   <Route path="admin/doctors" element={<ManageDoctors />} />
                   <Route path="admin/appointments" element={<AdminAppointments />} />
-                  <Route path="admin/reports" element={<div>Reports Page</div>} />
+                  <Route path="admin/reports" element={<Reports />} />
                   <Route path="admin/settings" element={<ThemeSettings />} />
                   <Route path="profile" element={<Profile />} />
                 </Route>

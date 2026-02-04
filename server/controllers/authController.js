@@ -139,6 +139,18 @@ const updateUserProfile = async (req, res) => {
             user.address = req.body.address || user.address;
 
             if (req.body.password) {
+                if (!req.body.currentPassword) {
+                    return res.status(400).json({ message: 'Please provide current password' });
+                }
+
+                // Re-fetch user with password since select: false by default
+                const userWithPassword = await User.findById(req.user.id).select('+password');
+                const isMatch = await bcrypt.compare(req.body.currentPassword, userWithPassword.password);
+
+                if (!isMatch) {
+                    return res.status(400).json({ message: 'Invalid current password' });
+                }
+
                 const salt = await bcrypt.genSalt(10);
                 user.password = await bcrypt.hash(req.body.password, salt);
             }
