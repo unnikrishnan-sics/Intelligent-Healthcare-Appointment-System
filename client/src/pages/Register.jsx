@@ -19,7 +19,10 @@ const Register = () => {
     const { theme } = useTheme();
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+        if (error) setError('');
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,18 +30,30 @@ const Register = () => {
         try {
             const data = await register(formData.name, formData.email, formData.password, formData.role, formData.address);
 
+            // Clear form data immediately
+            setFormData({
+                name: '',
+                email: '',
+                address: '',
+                password: '',
+                role: 'patient'
+            });
+
             if (data?.status === 'pending') {
                 toast.success('Registration successful! Please wait for Admin approval.');
                 setTimeout(() => navigate('/login'), 2000);
             } else {
-                toast.success('Account created successfully!');
-                setTimeout(() => navigate('/dashboard'), 2000);
+                toast.success('Account created successfully! Please login.');
+                setTimeout(() => navigate('/login'), 2000);
             }
         } catch (err) {
             const msg = err.response?.data?.message || 'Registration failed.';
             setError(msg);
             toast.error(msg);
             setLoading(false);
+
+            // Auto-clear error after 5 seconds
+            setTimeout(() => setError(''), 5000);
         }
     };
 

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { X, User, Mail, Lock, Stethoscope, FileText, Briefcase, DollarSign, Shield } from 'lucide-react';
+import { X, User, Mail, Lock, Stethoscope, FileText, Briefcase, DollarSign, Shield, Eye, EyeOff } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 const AddDoctorModal = ({ isOpen, onClose, onAdd }) => {
     const { theme } = useTheme();
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -12,6 +13,7 @@ const AddDoctorModal = ({ isOpen, onClose, onAdd }) => {
         bio: '',
         experience: '',
         feesPerConsultation: '',
+        address: '',
     });
 
     if (!isOpen) return null;
@@ -32,13 +34,16 @@ const AddDoctorModal = ({ isOpen, onClose, onAdd }) => {
             bio: '',
             experience: '',
             feesPerConsultation: '',
+            address: '',
         });
+        setShowPassword(false);
     };
 
+    // ... (lines 40-107 are unchanged, showing context below)
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-8 md:p-16 bg-white/10 backdrop-blur-2xl animate-fade-in">
             <div className="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl overflow-hidden animate-scale-up border border-gray-100 flex flex-col max-h-[85vh]">
-                {/* Header */}
+                {/* Header ... */}
                 <div className="relative p-8 border-b border-gray-50 bg-gradient-to-r from-gray-50 to-white">
                     <div className="flex justify-between items-center">
                         <div>
@@ -109,14 +114,39 @@ const AddDoctorModal = ({ isOpen, onClose, onAdd }) => {
                                             <Lock size={18} />
                                         </div>
                                         <input
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             name="password"
                                             value={formData.password}
                                             onChange={handleChange}
-                                            className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-gray-100 border-2 rounded-2xl focus:bg-white focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none text-gray-700 font-medium placeholder:text-gray-300"
+                                            className="w-full pl-12 pr-12 py-3.5 bg-gray-50 border-gray-100 border-2 rounded-2xl focus:bg-white focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none text-gray-700 font-medium placeholder:text-gray-300"
                                             placeholder="Minimum 6 characters"
                                             required
                                             minLength={6}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                                        >
+                                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2 md:col-span-2">
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">Clinic / Hospital Address</label>
+                                    <div className="relative group">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                            <Briefcase size={18} />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            name="address"
+                                            value={formData.address}
+                                            onChange={handleChange}
+                                            className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-gray-100 border-2 rounded-2xl focus:bg-white focus:border-blue-500/20 focus:ring-4 focus:ring-blue-500/5 transition-all outline-none text-gray-700 font-medium placeholder:text-gray-300"
+                                            placeholder="123 Medical Plaza, New York, NY"
+                                            required
                                         />
                                     </div>
                                 </div>

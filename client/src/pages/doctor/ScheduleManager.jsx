@@ -86,6 +86,7 @@ const ScheduleManager = () => {
             await axios.post(`${import.meta.env.VITE_API_URL}/api/doctors/profile`, payload, config);
 
             setMessage('Profile and schedule updated successfully!');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(() => setMessage(''), 3000);
 
         } catch (error) {
@@ -173,11 +174,11 @@ const ScheduleManager = () => {
 
                 {message && (
                     <div className={`p-3 rounded mb-4 ${message.toLowerCase().includes('failed') ||
-                            message.toLowerCase().includes('error') ||
-                            message.toLowerCase().includes('authorized') ||
-                            message.toLowerCase().includes('token')
-                            ? 'bg-red-100 text-red-700 border border-red-200'
-                            : 'bg-green-100 text-green-700 border border-green-200'
+                        message.toLowerCase().includes('error') ||
+                        message.toLowerCase().includes('authorized') ||
+                        message.toLowerCase().includes('token')
+                        ? 'bg-red-100 text-red-700 border border-red-200'
+                        : 'bg-green-100 text-green-700 border border-green-200'
                         }`}>
                         {message}
                     </div>
