@@ -20,7 +20,7 @@ const CheckoutForm = ({ clientSecret, onSuccess, amount, doctorName }) => {
         }
 
         setIsLoading(true);
-        setMessage(null);
+
 
         const { error, paymentIntent } = await stripe.confirmPayment({
             elements,
