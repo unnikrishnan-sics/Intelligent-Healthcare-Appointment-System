@@ -90,43 +90,43 @@ const updateQueueStatus = async (req, res) => {
 // @desc    Toggle Priority (Critical <-> Normal)
 // @route   PUT /api/queue/priority
 // @access  Private (Doctor)
-// const togglePriority = async (req, res) => {
-//     const { appointmentId } = req.body;
+const togglePriority = async (req, res) => {
+    const { appointmentId } = req.body;
 
-//     try {
-//         const appointment = await Appointment.findById(appointmentId);
-//         if (!appointment) return res.status(404).json({ message: 'Not found' });
+    try {
+        const appointment = await Appointment.findById(appointmentId);
+        if (!appointment) return res.status(404).json({ message: 'Not found' });
 
-//         appointment.priority = appointment.priority === 'Normal' ? 'Critical' : 'Normal';
-//         await appointment.save();
+        appointment.priority = appointment.priority === 'Normal' ? 'Critical' : 'Normal';
+        await appointment.save();
 
-//         res.json(appointment);
-//     } catch (error) {
-//         res.status(500).json({ message: 'Server Error' });
-//     }
-// };
+        res.json(appointment);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
 
 // @desc    Doctor Session Control (Pause/Resume)
 // @route   PUT /api/queue/control
 // @access  Private (Doctor)
-// const updateQueueControl = async (req, res) => {
-//     const { isPaused } = req.body;
+const updateQueueControl = async (req, res) => {
+    const { isPaused } = req.body;
 
-//     try {
-//         const doctor = await Doctor.findOneAndUpdate(
-//             { userId: req.user.id },
-//             { 'queueState.isPaused': isPaused },
-//             { new: true }
-//         );
-//         res.json(doctor.queueState);
-//     } catch (error) {
-//         res.status(500).json({ message: 'Server Error' });
-//     }
-// };
+    try {
+        const doctor = await Doctor.findOneAndUpdate(
+            { userId: req.user.id },
+            { 'queueState.isPaused': isPaused },
+            { new: true }
+        );
+        res.json(doctor.queueState);
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
 
 module.exports = {
     getQueue,
     updateQueueStatus,
-    // togglePriority,
-    // updateQueueControl
+    togglePriority,
+    updateQueueControl
 };

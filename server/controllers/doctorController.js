@@ -149,19 +149,19 @@ const getDoctors = async (req, res) => {
 // @desc    Get doctor by ID
 // @route   GET /api/doctors/:id
 // @access  Public
-// const getDoctorById = async (req, res) => {
-//     try {
-//         const doctor = await Doctor.findById(req.params.id).populate('userId', 'name email');
-//         if (doctor) {
-//             res.json(doctor);
-//         } else {
-//             res.status(404).json({ message: 'Doctor not found' });
-//         }
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Server Error' });
-//     }
-// };
+const getDoctorById = async (req, res) => {
+    try {
+        const doctor = await Doctor.findById(req.params.id).populate('userId', 'name email');
+        if (doctor) {
+            res.json(doctor);
+        } else {
+            res.status(404).json({ message: 'Doctor not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
 
 // @desc    Create/Update Doctor Profile
 // @route   POST /api/doctors/profile
@@ -236,60 +236,60 @@ const getDoctorProfile = async (req, res) => {
 // @desc    Get unique patients for the current doctor
 // @route   GET /api/doctors/patients
 // @access  Private (Doctor only)
-// const getDoctorPatients = async (req, res) => {
-//     try {
-//         // Find all appointments for this doctor
-//         // We use aggregation to group by patientId to get unique patients
-//         const patients = await require('../models/Appointment').aggregate([
-//             { $match: { doctorId: new mongoose.Types.ObjectId(req.user.id) } },
-//             { $group: { _id: "$patientId", lastAppointmentDate: { $max: "$date" } } },
-//             { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'patientDetails' } },
-//             { $unwind: "$patientDetails" },
-//             {
-//                 $project: {
-//                     _id: "$patientDetails._id",
-//                     name: "$patientDetails.name",
-//                     email: "$patientDetails.email",
-//                     age: "$patientDetails.age",
-//                     gender: "$patientDetails.gender",
-//                     phone: "$patientDetails.phone",
-//                     lastVisit: "$lastAppointmentDate"
-//                 }
-//             },
-//             { $sort: { lastVisit: -1 } }
-//         ]);
+const getDoctorPatients = async (req, res) => {
+    try {
+        // Find all appointments for this doctor
+        // We use aggregation to group by patientId to get unique patients
+        const patients = await require('../models/Appointment').aggregate([
+            { $match: { doctorId: new mongoose.Types.ObjectId(req.user.id) } },
+            { $group: { _id: "$patientId", lastAppointmentDate: { $max: "$date" } } },
+            { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'patientDetails' } },
+            { $unwind: "$patientDetails" },
+            {
+                $project: {
+                    _id: "$patientDetails._id",
+                    name: "$patientDetails.name",
+                    email: "$patientDetails.email",
+                    age: "$patientDetails.age",
+                    gender: "$patientDetails.gender",
+                    phone: "$patientDetails.phone",
+                    lastVisit: "$lastAppointmentDate"
+                }
+            },
+            { $sort: { lastVisit: -1 } }
+        ]);
 
-//         res.json(patients);
-//     } catch (error) {
-//         console.error('Error fetching patients:', error);
-//         res.status(500).json({ message: 'Server Error' });
-//     }
-// };
+        res.json(patients);
+    } catch (error) {
+        console.error('Error fetching patients:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
 
 // @desc    Get detailed history of a patient
 // @route   GET /api/doctors/patients/:patientId/history
 // @access  Private (Doctor)
-// const getPatientHistory = async (req, res) => {
-//     try {
-//         const { patientId } = req.params;
-//         // Simple find works here because mongoose casts string ID for find()
-//         const history = await require('../models/Appointment').find({
-//             doctorId: req.user.id,
-//             patientId: patientId
-//         }).populate('patientId', 'name email').sort({ date: -1 });
+const getPatientHistory = async (req, res) => {
+    try {
+        const { patientId } = req.params;
+        // Simple find works here because mongoose casts string ID for find()
+        const history = await require('../models/Appointment').find({
+            doctorId: req.user.id,
+            patientId: patientId
+        }).populate('patientId', 'name email').sort({ date: -1 });
 
-//         res.json(history);
-//     } catch (error) {
-//         console.error("Error fetching history:", error);
-//         res.status(500).json({ message: 'Server Error' });
-//     }
-// };
+        res.json(history);
+    } catch (error) {
+        console.error("Error fetching history:", error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
 
 module.exports = {
     getDoctors,
     updateDoctorProfile,
     getDoctorProfile,
-    // getDoctorById,
-    // getDoctorPatients,
-    // getPatientHistory
+    getDoctorById,
+    getDoctorPatients,
+    getPatientHistory
 };

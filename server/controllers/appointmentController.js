@@ -193,83 +193,83 @@ const getMyAppointments = async (req, res) => {
 // @desc    Update appointment status (Doctor/Admin)
 // @route   PUT /api/appointments/:id/status
 // @access  Private
-// const updateAppointmentStatus = async (req, res) => {
-//     const { status } = req.body;
+const updateAppointmentStatus = async (req, res) => {
+    const { status } = req.body;
 
-//     try {
-//         const appointment = await Appointment.findById(req.params.id);
+    try {
+        const appointment = await Appointment.findById(req.params.id);
 
-//         if (!appointment) {
-//             return res.status(404).json({ message: 'Appointment not found' });
-//         }
+        if (!appointment) {
+            return res.status(404).json({ message: 'Appointment not found' });
+        }
 
-//         // CANCELLATION LOGIC (5-Hour Window)
-//         if (status === 'Cancelled') {
-//             const appointmentDateTime = new Date(appointment.date);
-//             const [hours, mins] = appointment.timeSlot.split(':');
-//             appointmentDateTime.setHours(parseInt(hours), parseInt(mins), 0, 0);
+        // CANCELLATION LOGIC (5-Hour Window)
+        if (status === 'Cancelled') {
+            const appointmentDateTime = new Date(appointment.date);
+            const [hours, mins] = appointment.timeSlot.split(':');
+            appointmentDateTime.setHours(parseInt(hours), parseInt(mins), 0, 0);
 
-//             const now = new Date();
-//             const diffMs = appointmentDateTime - now;
-//             const diffHours = diffMs / (1000 * 60 * 60);
+            const now = new Date();
+            const diffMs = appointmentDateTime - now;
+            const diffHours = diffMs / (1000 * 60 * 60);
 
-//             if (diffHours < 5 && req.user.role === 'patient') {
-//                 return res.status(400).json({ message: 'Cancellations allowed only up to 5 hours before.' });
-//             }
-//         }
+            if (diffHours < 5 && req.user.role === 'patient') {
+                return res.status(400).json({ message: 'Cancellations allowed only up to 5 hours before.' });
+            }
+        }
 
-//         // Verify ownership (Doctor/Patient) or Admin
-//         if (req.user.role === 'admin') {
-//             // Admin can do anything
-//         } else if (req.user.role === 'doctor') {
-//             if (appointment.doctorId.toString() !== req.user.id.toString()) {
-//                 return res.status(401).json({ message: 'Not authorized' });
-//             }
-//         } else if (req.user.role === 'patient') {
-//             if (appointment.patientId.toString() !== req.user.id.toString()) {
-//                 return res.status(401).json({ message: 'Not authorized' });
-//             }
-//             if (status !== 'Cancelled') {
-//                 return res.status(400).json({ message: 'Patients can only cancel appointments' });
-//             }
-//         } else {
-//             return res.status(401).json({ message: 'Not authorized' });
-//         }
+        // Verify ownership (Doctor/Patient) or Admin
+        if (req.user.role === 'admin') {
+            // Admin can do anything
+        } else if (req.user.role === 'doctor') {
+            if (appointment.doctorId.toString() !== req.user.id.toString()) {
+                return res.status(401).json({ message: 'Not authorized' });
+            }
+        } else if (req.user.role === 'patient') {
+            if (appointment.patientId.toString() !== req.user.id.toString()) {
+                return res.status(401).json({ message: 'Not authorized' });
+            }
+            if (status !== 'Cancelled') {
+                return res.status(400).json({ message: 'Patients can only cancel appointments' });
+            }
+        } else {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
 
-//         appointment.status = status;
-//         if (status === 'Cancelled' && appointment.paymentStatus === 'Paid') {
-//             appointment.paymentStatus = 'Refunded'; // Placeholder
-//         }
+        appointment.status = status;
+        if (status === 'Cancelled' && appointment.paymentStatus === 'Paid') {
+            appointment.paymentStatus = 'Refunded'; // Placeholder
+        }
 
-//         await appointment.save();
-//         res.json(appointment);
+        await appointment.save();
+        res.json(appointment);
 
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Server Error' });
-//     }
-// };
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
 
 // @desc    Get all appointments (Admin)
 // @route   GET /api/appointments/admin/all
 // @access  Private (Admin)
-// const getAllAppointments = async (req, res) => {
-//     try {
-//         const appointments = await Appointment.find({})
-//             .populate('doctorId', 'name email')
-//             .populate('patientId', 'name email')
-//             .sort({ date: -1 });
-//         res.json(appointments);
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ message: 'Server Error' });
-//     }
-// };
+const getAllAppointments = async (req, res) => {
+    try {
+        const appointments = await Appointment.find({})
+            .populate('doctorId', 'name email')
+            .populate('patientId', 'name email')
+            .sort({ date: -1 });
+        res.json(appointments);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
 
 module.exports = {
     bookAppointment,
     getMyAppointments,
     verifyPayment,
-    // updateAppointmentStatus,
-    // getAllAppointments
+    updateAppointmentStatus,
+    getAllAppointments
 };
