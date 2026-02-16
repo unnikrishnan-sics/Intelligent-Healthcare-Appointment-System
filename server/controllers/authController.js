@@ -107,72 +107,72 @@ const loginUser = async (req, res) => {
 // @desc    Get user profile
 // @route   GET /api/auth/profile
 // @access  Private
-const getUserProfile = async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id);
-        if (user) {
-            res.json({
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                address: user.address
-            });
-        } else {
-            res.status(404).json({ message: 'User not found' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
+// const getUserProfile = async (req, res) => {
+//     try {
+//         const user = await User.findById(req.user.id);
+//         if (user) {
+//             res.json({
+//                 _id: user._id,
+//                 name: user.name,
+//                 email: user.email,
+//                 role: user.role,
+//                 address: user.address
+//             });
+//         } else {
+//             res.status(404).json({ message: 'User not found' });
+//         }
+//     } catch (error) {
+//         res.status(500).json({ message: 'Server Error' });
+//     }
+// };
 
 // @desc    Update user profile
 // @route   PUT /api/auth/profile
 // @access  Private
-const updateUserProfile = async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id);
+// const updateUserProfile = async (req, res) => {
+//     try {
+//         const user = await User.findById(req.user.id);
 
-        if (user) {
-            user.name = req.body.name || user.name;
-            user.email = req.body.email || user.email;
-            user.address = req.body.address || user.address;
+//         if (user) {
+//             user.name = req.body.name || user.name;
+//             user.email = req.body.email || user.email;
+//             user.address = req.body.address || user.address;
 
-            if (req.body.password) {
-                if (!req.body.currentPassword) {
-                    return res.status(400).json({ message: 'Please provide current password' });
-                }
+//             if (req.body.password) {
+//                 if (!req.body.currentPassword) {
+//                     return res.status(400).json({ message: 'Please provide current password' });
+//                 }
 
-                // Re-fetch user with password since select: false by default
-                const userWithPassword = await User.findById(req.user.id).select('+password');
-                const isMatch = await bcrypt.compare(req.body.currentPassword, userWithPassword.password);
+//                 // Re-fetch user with password since select: false by default
+//                 const userWithPassword = await User.findById(req.user.id).select('+password');
+//                 const isMatch = await bcrypt.compare(req.body.currentPassword, userWithPassword.password);
 
-                if (!isMatch) {
-                    return res.status(400).json({ message: 'Invalid current password' });
-                }
+//                 if (!isMatch) {
+//                     return res.status(400).json({ message: 'Invalid current password' });
+//                 }
 
-                const salt = await bcrypt.genSalt(10);
-                user.password = await bcrypt.hash(req.body.password, salt);
-            }
+//                 const salt = await bcrypt.genSalt(10);
+//                 user.password = await bcrypt.hash(req.body.password, salt);
+//             }
 
-            const updatedUser = await user.save();
+//             const updatedUser = await user.save();
 
-            res.json({
-                _id: updatedUser._id,
-                name: updatedUser.name,
-                email: updatedUser.email,
-                role: updatedUser.role,
-                address: updatedUser.address,
-                token: generateToken(updatedUser._id)
-            });
-        } else {
-            res.status(404).json({ message: 'User not found' });
-        }
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
+//             res.json({
+//                 _id: updatedUser._id,
+//                 name: updatedUser.name,
+//                 email: updatedUser.email,
+//                 role: updatedUser.role,
+//                 address: updatedUser.address,
+//                 token: generateToken(updatedUser._id)
+//             });
+//         } else {
+//             res.status(404).json({ message: 'User not found' });
+//         }
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Server Error' });
+//     }
+// };
 
 // @desc    Forgot Password
 // @route   POST /api/auth/forgotpassword
@@ -229,48 +229,48 @@ const forgotPassword = async (req, res) => {
 // @desc    Reset Password
 // @route   PUT /api/auth/resetpassword/:resettoken
 // @access  Public
-const resetPassword = async (req, res) => {
-    // Get hashed token
-    const resetPasswordToken = crypto
-        .createHash('sha256')
-        .update(req.params.resettoken)
-        .digest('hex');
+// const resetPassword = async (req, res) => {
+//     // Get hashed token
+//     const resetPasswordToken = crypto
+//         .createHash('sha256')
+//         .update(req.params.resettoken)
+//         .digest('hex');
 
-    try {
-        const user = await User.findOne({
-            resetPasswordToken,
-            resetPasswordExpire: { $gt: Date.now() }
-        });
+//     try {
+//         const user = await User.findOne({
+//             resetPasswordToken,
+//             resetPasswordExpire: { $gt: Date.now() }
+//         });
 
-        if (!user) {
-            return res.status(400).json({ message: 'Invalid token' });
-        }
+//         if (!user) {
+//             return res.status(400).json({ message: 'Invalid token' });
+//         }
 
-        // Set new password
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(req.body.password, salt);
+//         // Set new password
+//         const salt = await bcrypt.genSalt(10);
+//         user.password = await bcrypt.hash(req.body.password, salt);
 
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpire = undefined;
+//         user.resetPasswordToken = undefined;
+//         user.resetPasswordExpire = undefined;
 
-        await user.save();
+//         await user.save();
 
-        res.status(200).json({
-            message: 'Password updated success',
-            token: generateToken(user._id)
-        });
+//         res.status(200).json({
+//             message: 'Password updated success',
+//             token: generateToken(user._id)
+//         });
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Server Error' });
+//     }
+// };
 
 module.exports = {
     registerUser,
     loginUser,
-    getUserProfile,
-    updateUserProfile,
     forgotPassword,
-    resetPassword
+    // getUserProfile,
+    // updateUserProfile,
+    // resetPassword
 };

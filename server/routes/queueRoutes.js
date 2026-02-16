@@ -16,7 +16,7 @@ router.get('/:doctorId', getQueue);
 
 // Doctor Actions
 router.put('/status', doctor, updateQueueStatus);
-router.put('/priority', doctor, togglePriority);
-router.put('/control', doctor, updateQueueControl);
+// router.put('/priority', doctor, togglePriority);
+// router.put('/control', doctor, updateQueueControl);
 
 module.exports = router;

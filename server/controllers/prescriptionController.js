@@ -36,31 +36,31 @@ const createPrescription = async (req, res) => {
 // @desc    Get prescription by appointment ID
 // @route   GET /api/prescriptions/:appointmentId
 // @access  Private (Doctor/Patient/Admin)
-const getPrescription = async (req, res) => {
-    try {
-        const prescription = await Prescription.findOne({ appointmentId: req.params.appointmentId })
-            .populate('doctorId', 'name')
-            .populate('patientId', 'name');
+// const getPrescription = async (req, res) => {
+//     try {
+//         const prescription = await Prescription.findOne({ appointmentId: req.params.appointmentId })
+//             .populate('doctorId', 'name')
+//             .populate('patientId', 'name');
 
-        if (!prescription) {
-            return res.status(404).json({ message: 'Prescription not found' });
-        }
+//         if (!prescription) {
+//             return res.status(404).json({ message: 'Prescription not found' });
+//         }
 
-        // Access Control
-        if (req.user.role !== 'admin' &&
-            req.user.id !== prescription.doctorId._id.toString() &&
-            req.user.id !== prescription.patientId._id.toString()) {
-            return res.status(401).json({ message: 'Not authorized' });
-        }
+//         // Access Control
+//         if (req.user.role !== 'admin' &&
+//             req.user.id !== prescription.doctorId._id.toString() &&
+//             req.user.id !== prescription.patientId._id.toString()) {
+//             return res.status(401).json({ message: 'Not authorized' });
+//         }
 
-        res.json(prescription);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
+//         res.json(prescription);
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: 'Server Error' });
+//     }
+// };
 
 module.exports = {
     createPrescription,
-    getPrescription
+    // getPrescription
 };

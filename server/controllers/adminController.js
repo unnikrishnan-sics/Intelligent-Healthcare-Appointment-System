@@ -18,48 +18,48 @@ const getAllUsers = async (req, res) => {
 // @desc    Update user status (Approve/Reject)
 // @route   PUT /api/admin/users/:id/status
 // @access  Private/Admin
-const updateUserStatus = async (req, res) => {
-    try {
-        const { status } = req.body;
-        const user = await User.findById(req.params.id);
+// const updateUserStatus = async (req, res) => {
+//     try {
+//         const { status } = req.body;
+//         const user = await User.findById(req.params.id);
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+//         if (!user) {
+//             return res.status(404).json({ message: 'User not found' });
+//         }
 
-        user.status = status;
-        await user.save();
+//         user.status = status;
+//         await user.save();
 
-        res.json({ message: `User status updated to ${status}`, user });
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
+//         res.json({ message: `User status updated to ${status}`, user });
+//     } catch (error) {
+//         res.status(500).json({ message: 'Server Error' });
+//     }
+// };
 
 // @desc    Delete user
 // @route   DELETE /api/admin/users/:id
 // @access  Private/Admin
-const deleteUser = async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
+// const deleteUser = async (req, res) => {
+//     try {
+//         const user = await User.findById(req.params.id);
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+//         if (!user) {
+//             return res.status(404).json({ message: 'User not found' });
+//         }
 
-        // If user is a doctor, delete their doctor profile too
-        if (user.role === 'doctor') {
-            const Doctor = require('../models/Doctor');
-            await Doctor.findOneAndDelete({ userId: user._id });
-        }
+//         // If user is a doctor, delete their doctor profile too
+//         if (user.role === 'doctor') {
+//             const Doctor = require('../models/Doctor');
+//             await Doctor.findOneAndDelete({ userId: user._id });
+//         }
 
-        await user.deleteOne();
-        res.json({ message: 'User removed' });
-    } catch (error) {
-        console.error('Delete User Error:', error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
+//         await user.deleteOne();
+//         res.json({ message: 'User removed' });
+//     } catch (error) {
+//         console.error('Delete User Error:', error);
+//         res.status(500).json({ message: 'Server Error' });
+//     }
+// };
 
 // @desc    Get System Stats (Dashboard)
 // @route   GET /api/admin/stats
@@ -93,54 +93,54 @@ const getSystemStats = async (req, res) => {
 // @desc    Admin add new doctor
 // @route   POST /api/admin/doctors
 // @access  Private/Admin
-const addDoctor = async (req, res) => {
-    try {
-        const { name, email, password, specialization, bio, experience, feesPerConsultation, address, phone, gender, dob } = req.body;
+// const addDoctor = async (req, res) => {
+//     try {
+//         const { name, email, password, specialization, bio, experience, feesPerConsultation, address, phone, gender, dob } = req.body;
 
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
+//         const userExists = await User.findOne({ email });
+//         if (userExists) {
+//             return res.status(400).json({ message: 'User already exists' });
+//         }
 
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+//         const salt = await bcrypt.genSalt(10);
+//         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const user = await User.create({
-            name,
-            email,
-            password: hashedPassword,
-            role: 'doctor',
-            status: 'active',
-            address: address || '',
-            phone: phone || '',
-            gender: gender || 'Other',
-            dob: dob || null
-        });
+//         const user = await User.create({
+//             name,
+//             email,
+//             password: hashedPassword,
+//             role: 'doctor',
+//             status: 'active',
+//             address: address || '',
+//             phone: phone || '',
+//             gender: gender || 'Other',
+//             dob: dob || null
+//         });
 
-        const doctor = await Doctor.create({
-            userId: user._id,
-            specialization,
-            bio,
-            experience,
-            feesPerConsultation
-        });
+//         const doctor = await Doctor.create({
+//             userId: user._id,
+//             specialization,
+//             bio,
+//             experience,
+//             feesPerConsultation
+//         });
 
-        res.status(201).json({
-            message: 'Doctor created successfully',
-            user: {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                status: user.status
-            },
-            doctor
-        });
-    } catch (error) {
-        console.error('Add Doctor Error:', error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
+//         res.status(201).json({
+//             message: 'Doctor created successfully',
+//             user: {
+//                 _id: user._id,
+//                 name: user.name,
+//                 email: user.email,
+//                 role: user.role,
+//                 status: user.status
+//             },
+//             doctor
+//         });
+//     } catch (error) {
+//         console.error('Add Doctor Error:', error);
+//         res.status(500).json({ message: 'Server Error' });
+//     }
+// };
 
 // @desc    Get Detailed Reports (Patients + Doctors)
 // @route   GET /api/admin/reports
@@ -201,36 +201,36 @@ const getDoctorPatients = async (req, res) => {
 // @desc    Get appointments for export (Doctor + Patient filter)
 // @route   GET /api/admin/export-appointments
 // @access  Private/Admin
-const getExportAppointments = async (req, res) => {
-    try {
-        const { doctorId, patientId } = req.query;
-        const Appointment = require('../models/Appointment');
+// const getExportAppointments = async (req, res) => {
+//     try {
+//         const { doctorId, patientId } = req.query;
+//         const Appointment = require('../models/Appointment');
 
-        const query = {};
-        if (doctorId) query.doctorId = doctorId;
-        if (patientId) query.patientId = patientId;
+//         const query = {};
+//         if (doctorId) query.doctorId = doctorId;
+//         if (patientId) query.patientId = patientId;
 
-        const appointments = await Appointment.find(query)
-            .populate('patientId', 'name email')
-            .populate('doctorId', 'name')
-            .sort({ date: -1 });
+//         const appointments = await Appointment.find(query)
+//             .populate('patientId', 'name email')
+//             .populate('doctorId', 'name')
+//             .sort({ date: -1 });
 
-        res.json(appointments);
-    } catch (error) {
-        console.error('Get Export Appointments Error:', error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
+//         res.json(appointments);
+//     } catch (error) {
+//         console.error('Get Export Appointments Error:', error);
+//         res.status(500).json({ message: 'Server Error' });
+//     }
+// };
 
 module.exports = {
     getAllUsers,
-    updateUserStatus,
-    deleteUser,
+    // updateUserStatus,
+    // deleteUser,
     getSystemStats,
-    addDoctor,
+    // addDoctor,
     getReports,
     getDoctorPatients,
-    getExportAppointments
+    // getExportAppointments
 };
 
 

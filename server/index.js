@@ -54,4 +54,9 @@ app.listen(PORT, () => {
     startReminderJob(); // Start Cron Job
 });
 
+// Global 404 Error Handler
+app.use((req, res, next) => {
+    res.status(404).json({ message: 'Route not found' });
+});
+
 module.exports = app;
