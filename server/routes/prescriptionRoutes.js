@@ -4,6 +4,6 @@ const { createPrescription, getPrescription } = require('../controllers/prescrip
 const { protect, doctor } = require('../middleware/authMiddleware');
 
 router.post('/', protect, doctor, createPrescription);
-// router.get('/:appointmentId', protect, getPrescription);
+router.get('/:appointmentId', protect, getPrescription);
 
 module.exports = router;
