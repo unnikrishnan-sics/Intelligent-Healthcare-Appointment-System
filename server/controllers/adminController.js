@@ -1,7 +1,8 @@
 const User = require('../models/User');
 const Doctor = require('../models/Doctor');
 const bcrypt = require('bcryptjs');
-
+const Appointment = require('../models/Appointment');
+const mongoose = require('mongoose');
 
 // @desc    Get all users (with filtering)
 // @route   GET /api/admin/users
@@ -220,6 +221,44 @@ const getExportAppointments = async (req, res) => {
         console.error('Get Export Appointments Error:', error);
         res.status(500).json({ message: 'Server Error' });
     }
+};// @desc    Admin update doctor profile (Schedule, Fees, etc)
+// @route   PUT /api/admin/doctors/:id/profile
+// @access  Private/Admin
+const updateDoctorProfileAdmin = async (req, res) => {
+    const { specialization, bio, experience, feesPerConsultation, availability } = req.body;
+
+    // Build profile object
+    const profileFields = {};
+    if (specialization) profileFields.specialization = specialization;
+    if (bio) profileFields.bio = bio;
+    if (experience) profileFields.experience = experience;
+    if (feesPerConsultation) profileFields.feesPerConsultation = feesPerConsultation;
+    if (availability) profileFields.availability = availability;
+
+    try {
+        // req.params.id is the USER ID of the doctor
+        let doctor = await Doctor.findOne({ userId: req.params.id });
+
+        if (doctor) {
+            // Update
+            doctor = await Doctor.findOneAndUpdate(
+                { userId: req.params.id },
+                { $set: profileFields },
+                { new: true, runValidators: true }
+            );
+            return res.json(doctor);
+        }
+
+        // Create if doesn't exist (though it should for active doctors)
+        profileFields.userId = req.params.id;
+        doctor = new Doctor(profileFields);
+        await doctor.save();
+        res.json(doctor);
+
+    } catch (error) {
+        console.error('Admin Update Doctor Error:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
 };
 
 module.exports = {
@@ -230,7 +269,8 @@ module.exports = {
     addDoctor,
     getReports,
     getDoctorPatients,
-    getExportAppointments
+    getExportAppointments,
+    updateDoctorProfileAdmin
 };
 
 

@@ -6,6 +6,7 @@ import { UserPlus, User, Trash2, CheckCircle, XCircle, Clock } from 'lucide-reac
 import toast from 'react-hot-toast';
 import ConfirmationModal from '../../components/common/ConfirmationModal';
 import AddDoctorModal from '../../components/admin/AddDoctorModal';
+import AdminScheduleModal from '../../components/admin/AdminScheduleModal';
 
 
 
@@ -20,6 +21,8 @@ const ManageDoctors = () => {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [doctorToDelete, setDoctorToDelete] = useState(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+    const [selectedDoctorForSchedule, setSelectedDoctorForSchedule] = useState(null);
 
 
 
@@ -208,12 +211,25 @@ const ManageDoctors = () => {
                                             </button>
                                         </div>
                                     ) : (
-                                        <button
-                                            onClick={() => handleDeleteClick(doc._id)}
-                                            className="text-red-600 hover:text-red-900 transition-colors"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
+                                        <div className="flex justify-end gap-3">
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedDoctorForSchedule(doc);
+                                                    setIsScheduleModalOpen(true);
+                                                }}
+                                                className="text-blue-600 hover:text-blue-900 transition-colors p-1.5 hover:bg-blue-50 rounded-lg"
+                                                title="Manage Schedule"
+                                            >
+                                                <Clock size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteClick(doc._id)}
+                                                className="text-red-600 hover:text-red-900 transition-colors p-1.5 hover:bg-red-50 rounded-lg"
+                                                title="Delete Doctor"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
                                     )}
                                 </td>
                             </tr>
@@ -245,6 +261,18 @@ const ManageDoctors = () => {
                 onClose={() => setIsAddModalOpen(false)}
                 onAdd={handleAddDoctor}
             />
+
+            {selectedDoctorForSchedule && (
+                <AdminScheduleModal
+                    isOpen={isScheduleModalOpen}
+                    doctor={selectedDoctorForSchedule}
+                    onClose={() => {
+                        setIsScheduleModalOpen(false);
+                        setSelectedDoctorForSchedule(null);
+                    }}
+                    onUpdate={fetchDoctors}
+                />
+            )}
         </div>
     );
 };

@@ -93,46 +93,66 @@ const DoctorPatients = () => {
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredPatients.map((patient) => (
-                        <div key={patient._id} className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-all duration-300 overflow-hidden group">
-                            <div className="p-6">
-                                <div className="flex items-center gap-4 mb-4">
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl`} style={{ backgroundColor: theme.primaryColor }}>
-                                        {patient.name.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-gray-800 group-hover:text-blue-600 transition-colors">{patient.name}</h3>
-                                        <p className="text-xs text-gray-500">{patient.age} years • {patient.gender}</p>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2 text-sm text-gray-600">
-                                    <div className="flex items-center gap-2">
-                                        <Mail size={14} className="text-gray-400" />
-                                        <span>{patient.email}</span>
-                                    </div>
-                                    {patient.phone && (
-                                        <div className="flex items-center gap-2">
-                                            <Phone size={14} className="text-gray-400" />
-                                            <span>{patient.phone}</span>
+                <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-100">
+                        <thead className="bg-gray-50/50">
+                            <tr>
+                                <th className="px-6 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Patient ID</th>
+                                <th className="px-6 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Patient Name</th>
+                                <th className="px-6 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Contact & Info</th>
+                                <th className="px-6 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Last Visit</th>
+                                <th className="px-6 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {filteredPatients.map((patient) => (
+                                <tr key={patient._id} className="hover:bg-blue-50/30 transition-all duration-300 group">
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <span className="text-xs font-bold text-gray-400">#{patient._id.slice(-6).toUpperCase()}</span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-sm" style={{ backgroundColor: theme.primaryColor }}>
+                                                {patient.name.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <div className="text-sm font-black text-gray-900 leading-tight">{patient.name}</div>
+                                                <div className="text-[10px] font-bold text-gray-400 uppercase">{patient.gender} • {patient.age}y</div>
+                                            </div>
                                         </div>
-                                    )}
-                                    <div className="flex items-center gap-2 mt-4 pt-4 border-t">
-                                        <Clock size={14} className="text-gray-400" />
-                                        <span className="text-xs text-gray-500">Last Visit: {new Date(patient.lastVisit).toLocaleDateString()}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => setSelectedPatient(patient)}
-                                className="w-full bg-gray-50 px-6 py-3 border-t flex justify-between items-center group-hover:bg-blue-50 transition-colors text-left"
-                            >
-                                <span className="text-xs font-semibold text-gray-500 group-hover:text-blue-600">View History</span>
-                                <ChevronRight size={16} className="text-gray-400 group-hover:text-blue-600" />
-                            </button>
-                        </div>
-                    ))}
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                                                <Mail size={12} className="text-gray-400" />
+                                                {patient.email}
+                                            </div>
+                                            {patient.phone && (
+                                                <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                                                    <Phone size={12} className="text-gray-400" />
+                                                    {patient.phone}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
+                                            <Calendar size={14} className="text-gray-400" />
+                                            {new Date(patient.lastVisit).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                                        <button
+                                            onClick={() => setSelectedPatient(patient)}
+                                            className="px-4 py-2 bg-white border border-gray-100 rounded-xl text-xs font-bold text-gray-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm flex items-center gap-2 ml-auto"
+                                        >
+                                            View History <ChevronRight size={14} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
             )}
 

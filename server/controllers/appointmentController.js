@@ -4,8 +4,8 @@ const User = require('../models/User');
 const { calculateNoShowRisk } = require('../utils/predictionService');
 const { sendBookingReceipt } = require('../utils/emailService');
 
-// Initialize Stripe
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// Stripe removed as requested by user for mock flow
+// const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // @desc    Book an appointment (Initialize Payment)
 // @route   POST /api/appointments
@@ -70,11 +70,11 @@ const bookAppointment = async (req, res) => {
         // Calculate Risk Score
         const prediction = await calculateNoShowRisk(req.user.id, date, timeSlot);
 
-        // 3. CREATE STRIPE PAYMENT INTENT
-        const amount = (doctorProfile.feesPerConsultation || 500) * 100; // cents
-        const currency = 'inr';
+        // 3. MOCK PAYMENT DATA (Removing Stripe)
+        const amount = (doctorProfile.feesPerConsultation || 500);
 
-        // Stripe India Export Requirement: Customer Name and Address
+        // No Stripe Payment Intent Created
+        /*
         const customerAddress = req.user.address || "India"; // Fallback if empty, but we encourage it
         const customerName = req.user.name;
 
@@ -100,8 +100,9 @@ const bookAppointment = async (req, res) => {
                 tokenNumber: nextToken
             }
         });
+        */
 
-        const { sendBookingReceipt } = require('../utils/emailService');
+        // const { sendBookingReceipt } = require('../utils/emailService'); // This line is already at the top
 
         // ... (in bookAppointment)
 
@@ -115,7 +116,7 @@ const bookAppointment = async (req, res) => {
             reason,
             status: 'Pending',
             paymentStatus: 'Pending',
-            razorpayOrderId: paymentIntent.id, // Storing PI ID here for reference
+            razorpayOrderId: 'MOCK_ORDER_' + Date.now(), // Reference for mock flow
             predictionScore: prediction.score,
             riskFactors: prediction.factors
         });
@@ -125,7 +126,7 @@ const bookAppointment = async (req, res) => {
 
         res.status(201).json({
             appointment,
-            clientSecret: paymentIntent.client_secret, // Send to Frontend
+            clientSecret: 'mock_secret_' + appointment._id, // Mock secret for frontend
             tokenNumber: nextToken
         });
 
@@ -135,7 +136,7 @@ const bookAppointment = async (req, res) => {
     }
 };
 
-// @desc    Verify Payment and Confirm Appointment
+// @desc    Verify Mock Payment and Confirm Appointment
 // @route   POST /api/appointments/verify-payment
 // @access  Private
 const verifyPayment = async (req, res) => {
@@ -145,18 +146,16 @@ const verifyPayment = async (req, res) => {
         const appointment = await Appointment.findById(appointmentId);
         if (!appointment) return res.status(404).json({ message: 'Appointment not found' });
 
-        // Retrieve PI from Stripe
-        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-
-        if (paymentIntent.status === 'succeeded') {
+        // Mock verification - always succeed if data is present
+        if (paymentIntentId && paymentIntentId.startsWith('mock_')) {
             appointment.status = 'Confirmed';
             appointment.paymentStatus = 'Paid';
-            appointment.razorpayPaymentId = paymentIntentId; // Use Stripe PI as ID
+            appointment.razorpayPaymentId = paymentIntentId; // Mock Payment ID
             await appointment.save();
 
-            res.json({ message: "Payment verified successfully", appointment });
+            res.json({ message: "Mock payment verified successfully", appointment });
         } else {
-            res.status(400).json({ message: "Payment not successful" });
+            res.status(400).json({ message: "Invalid mock payment data" });
         }
 
     } catch (error) {

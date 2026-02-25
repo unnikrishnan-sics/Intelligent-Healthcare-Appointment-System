@@ -12,6 +12,7 @@ router.get('/export-appointments', protect, admin, getExportAppointments);
 router.put('/users/:id/status', protect, admin, updateUserStatus);
 router.delete('/users/:id', protect, admin, deleteUser);
 router.post('/doctors', protect, admin, addDoctor);
+router.put('/doctors/:id/profile', protect, admin, updateDoctorProfileAdmin);
 
 
 module.exports = router;

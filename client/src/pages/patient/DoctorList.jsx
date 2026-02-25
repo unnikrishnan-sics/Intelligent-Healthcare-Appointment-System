@@ -73,66 +73,69 @@ const DoctorList = () => {
 
             {/* Doctors Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                {filteredDoctors.map((doctor) => (
-                    <div key={doctor._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
-                        <div className="p-6">
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="flex-1">
-                                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                        {doctor.userId?.name || 'Dr. Unknown'}
-                                    </h3>
-                                    <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mt-2">
-                                        {doctor.specialization}
+                {filteredDoctors.length === 0 ? (
+                    <div className="col-span-full py-20 text-center text-gray-400 font-bold bg-white rounded-3xl border border-dashed border-gray-200">
+                        No doctors found matching your criteria.
+                    </div>
+                ) : (
+                    filteredDoctors.map((doctor) => (
+                        <div key={doctor._id} className="bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 group border border-gray-100 flex flex-col">
+                            {/* Card Header */}
+                            <div className="p-1 relative">
+                                <div className="h-2 rounded-t-2xl opacity-80" style={{ backgroundColor: theme.primaryColor }}></div>
+                                <div className="absolute top-1/2 left-8 -translate-y-1/2 w-16 h-16 bg-white rounded-2xl shadow-lg p-1">
+                                    <div className="w-full h-full rounded-xl flex items-center justify-center text-white font-black text-2xl" style={{ backgroundColor: theme.primaryColor }}>
+                                        {doctor.userId.name.charAt(0)}
                                     </div>
-                                </div>
-                                <div className="bg-green-50 text-green-700 px-3 py-1 rounded-lg text-sm font-bold flex flex-col items-center">
-                                    <span>{doctor.experience}+</span>
-                                    <span className="text-[10px] uppercase font-normal">Years</span>
                                 </div>
                             </div>
 
-                            <p className="text-gray-500 text-sm line-clamp-2 mb-6 h-10 leading-relaxed">
-                                {doctor.bio || 'Experienced specialist dedicated to patient care and treatment excellence.'}
-                            </p>
+                            <div className="p-8 pt-10 flex-1 flex flex-col">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div>
+                                        <h3 className="text-xl font-black text-gray-900 leading-tight group-hover:text-blue-600 transition-colors uppercase tracking-tight">{doctor.userId.name}</h3>
+                                        <div className="inline-block px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black rounded-lg uppercase tracking-widest mt-1">
+                                            {doctor.specialization}
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-sm font-black text-gray-900">₹{doctor.feesPerConsultation}</div>
+                                        <div className="text-[10px] font-bold text-gray-400 uppercase">Per Session</div>
+                                    </div>
+                                </div>
 
-                            <div className="space-y-3 pt-4 border-t border-gray-100">
-                                <div className="flex items-center justify-between text-sm text-gray-600">
-                                    <div className="flex items-center gap-2">
-                                        <Clock size={16} className="text-blue-500" />
-                                        <span>Next Available:</span>
+                                <p className="text-sm text-gray-500 font-medium mb-6 line-clamp-2 leading-relaxed italic">"{doctor.bio}"</p>
+
+                                <div className="grid grid-cols-2 gap-4 mb-8">
+                                    <div className="bg-gray-50 p-3 rounded-2xl flex items-center gap-3">
+                                        <Briefcase className="text-gray-400" size={18} />
+                                        <div>
+                                            <div className="text-[10px] font-black text-gray-400 uppercase leading-none">Exp</div>
+                                            <div className="text-sm font-bold text-gray-700">{doctor.experience} Yrs</div>
+                                        </div>
                                     </div>
-                                    <span className="font-medium text-green-600">Today</span>
-                                </div>
-                                <div className="flex items-center justify-between text-sm text-gray-600">
-                                    <div className="flex items-center gap-2">
-                                        <MapPin size={16} className="text-gray-400" />
-                                        <span>Fee:</span>
+                                    <div className="bg-gray-50 p-3 rounded-2xl flex items-center gap-3">
+                                        <Clock className="text-gray-400" size={18} />
+                                        <div>
+                                            <div className="text-[10px] font-black text-gray-400 uppercase leading-none">Wait</div>
+                                            <div className="text-sm font-bold text-gray-700">~15 Min</div>
+                                        </div>
                                     </div>
-                                    <span className="font-bold text-gray-900 text-lg">${doctor.feesPerConsultation}</span>
                                 </div>
+
+                                <button
+                                    onClick={() => setSelectedDoctor(doctor)}
+                                    className="w-full py-4 text-white font-black rounded-2xl flex items-center justify-center gap-2 group/btn relative overflow-hidden transition-all shadow-lg hover:shadow-xl mt-auto"
+                                    style={{ backgroundColor: theme.primaryColor }}
+                                >
+                                    <span className="relative z-10 uppercase tracking-widest">Book Appointment</span>
+                                    <ChevronRight className="relative z-10 group-hover/btn:translate-x-1 transition-transform" size={20} />
+                                </button>
                             </div>
-
-                            <button
-                                onClick={() => handleBookClick(doctor)}
-                                className="mt-6 w-full py-3 rounded-xl text-white font-bold text-sm uppercase tracking-wider shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
-                                style={{ backgroundColor: theme.primaryColor }}
-                            >
-                                Book Appointment
-                            </button>
                         </div>
-                    </div>
-                ))}
+                    ))
+                )}
             </div>
-
-            {filteredDoctors.length === 0 && (
-                <div className="text-center py-20 animate-fade-in">
-                    <div className="bg-gray-50 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                        <Search className="h-10 w-10 text-gray-400" />
-                    </div>
-                    <h3 className="text-xl font-medium text-gray-900 mb-2">No doctors found</h3>
-                    <p className="text-gray-500">Try adjusting your search terms or browse all specialists.</p>
-                </div>
-            )}
 
             {selectedDoctor && (
                 <BookingModal

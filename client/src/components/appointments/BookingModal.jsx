@@ -2,16 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useTheme } from '../../context/ThemeContext';
 import { X, Calendar as CalendarIcon, Clock } from 'lucide-react';
-
-// Stripe Imports
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from '../common/CheckoutForm';
-
-// Initialize Stripe Promise (outside component to avoid recreation)
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY, {
-    developerTools: { assistant: { enabled: false } }
-});
 
 const BookingModal = ({ doctor, isOpen, onClose }) => {
     // Hooks MUST be at top level
@@ -22,8 +13,8 @@ const BookingModal = ({ doctor, isOpen, onClose }) => {
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
     const [bookedToken, setBookedToken] = useState(null);
-    const [clientSecret, setClientSecret] = useState(''); // New State for Stripe
-    const [appointmentId, setAppointmentId] = useState(null); // Track Appt ID
+    const [clientSecret, setClientSecret] = useState('');
+    const [appointmentId, setAppointmentId] = useState(null);
 
     const { theme } = useTheme();
 
@@ -46,7 +37,6 @@ const BookingModal = ({ doctor, isOpen, onClose }) => {
 
     const sessions = generateSessions();
 
-    // Step 1: Initiate Booking & Get Payment Intent
     const handleBook = async () => {
         if (!date || !selectedSlot) return;
         setLoading(true);
@@ -63,13 +53,9 @@ const BookingModal = ({ doctor, isOpen, onClose }) => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            // Pass data to state
             setBookedToken(data.tokenNumber);
             setAppointmentId(data.appointment._id);
             setClientSecret(data.clientSecret);
-
-            // We do NOT set success=true yet. We wait for payment.
-            // UI will switch to Payment Form because clientSecret is set.
 
         } catch (err) {
             console.error("Booking Error:", err.response?.data);
@@ -79,36 +65,26 @@ const BookingModal = ({ doctor, isOpen, onClose }) => {
         }
     };
 
-    // Step 2: Handle Successful Payment from CheckoutForm
     const handlePaymentSuccess = async (paymentIntentId) => {
         try {
             const token = localStorage.getItem('token');
-            // Notify Backend
             await axios.post(`${import.meta.env.VITE_API_URL}/api/appointments/verify-payment`, {
                 paymentIntentId,
                 appointmentId
             }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            setSuccess(true); // Now show success screen
+            setSuccess(true);
         } catch (err) {
             console.error("Verification Error", err);
             setError("Payment succeeded but verification failed. Please contact support.");
         }
     };
 
-    const options = {
-        mode: 'payment',
-        amount: 1000,
-        currency: 'inr',
-        appearance: { theme: 'stripe' },
-    };
-
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden animate-fade-in relative max-h-[90vh] overflow-y-auto">
 
-                {/* Header */}
                 <div className="p-6 text-white flex justify-between items-center" style={{ backgroundColor: theme.primaryColor }}>
                     <h2 className="text-xl font-bold">Book Queue Token</h2>
                     <button onClick={onClose} className="hover:bg-white/20 p-1 rounded-full text-white">
@@ -134,17 +110,13 @@ const BookingModal = ({ doctor, isOpen, onClose }) => {
                             </button>
                         </div>
                     ) : clientSecret ? (
-                        // PAYMENT MODE
-                        <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'stripe' } }}>
-                            <CheckoutForm
-                                clientSecret={clientSecret}
-                                onSuccess={handlePaymentSuccess}
-                                amount={doctor.feesPerConsultation || 500}
-                                doctorName={doctor.userId?.name}
-                            />
-                        </Elements>
+                        <CheckoutForm
+                            clientSecret={clientSecret}
+                            onSuccess={handlePaymentSuccess}
+                            amount={doctor.feesPerConsultation || 500}
+                            doctorName={doctor.userId?.name}
+                        />
                     ) : (
-                        // BOOKING FORM MODE
                         <>
                             <div className="mb-6">
                                 <p className="text-gray-500 text-sm uppercase font-semibold mb-1">Doctor</p>
