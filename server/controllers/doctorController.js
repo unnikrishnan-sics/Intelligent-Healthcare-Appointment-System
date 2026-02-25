@@ -151,7 +151,16 @@ const getDoctors = async (req, res) => {
 // @access  Public
 const getDoctorById = async (req, res) => {
     try {
-        const doctor = await Doctor.findById(req.params.id).populate('userId', 'name email');
+        const { id } = req.params;
+
+        // Try finding by Doctor document _id first
+        let doctor = await Doctor.findById(id).populate('userId', 'name email');
+
+        // If not found, try finding by userId (since frontend often uses userId as doctor ID)
+        if (!doctor) {
+            doctor = await Doctor.findOne({ userId: id }).populate('userId', 'name email');
+        }
+
         if (doctor) {
             res.json(doctor);
         } else {

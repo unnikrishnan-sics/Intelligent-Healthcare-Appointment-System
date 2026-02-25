@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { UserPlus, User, Trash2, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { UserPlus, User, Trash2, CheckCircle, XCircle, Clock, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmationModal from '../../components/common/ConfirmationModal';
 import AddDoctorModal from '../../components/admin/AddDoctorModal';
@@ -23,6 +23,7 @@ const ManageDoctors = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
     const [selectedDoctorForSchedule, setSelectedDoctorForSchedule] = useState(null);
+    const [isViewMode, setIsViewMode] = useState(false);
 
 
 
@@ -215,6 +216,18 @@ const ManageDoctors = () => {
                                             <button
                                                 onClick={() => {
                                                     setSelectedDoctorForSchedule(doc);
+                                                    setIsViewMode(true);
+                                                    setIsScheduleModalOpen(true);
+                                                }}
+                                                className="text-gray-600 hover:text-gray-900 transition-colors p-1.5 hover:bg-gray-50 rounded-lg"
+                                                title="View Details"
+                                            >
+                                                <Eye size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedDoctorForSchedule(doc);
+                                                    setIsViewMode(false);
                                                     setIsScheduleModalOpen(true);
                                                 }}
                                                 className="text-blue-600 hover:text-blue-900 transition-colors p-1.5 hover:bg-blue-50 rounded-lg"
@@ -266,9 +279,11 @@ const ManageDoctors = () => {
                 <AdminScheduleModal
                     isOpen={isScheduleModalOpen}
                     doctor={selectedDoctorForSchedule}
+                    viewOnly={isViewMode}
                     onClose={() => {
                         setIsScheduleModalOpen(false);
                         setSelectedDoctorForSchedule(null);
+                        setIsViewMode(false);
                     }}
                     onUpdate={fetchDoctors}
                 />

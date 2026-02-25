@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { protect, admin } = require('../middleware/authMiddleware');
-const { getAllUsers, updateUserStatus, deleteUser, getSystemStats, addDoctor, getReports, getDoctorPatients, getExportAppointments } = require('../controllers/adminController');
+const { getAllUsers, updateUserStatus, deleteUser, getSystemStats, addDoctor, getReports, getDoctorPatients, getExportAppointments, updateDoctorProfileAdmin } = require('../controllers/adminController');
 
 router.get('/stats', protect, admin, getSystemStats);
 router.get('/users', protect, admin, getAllUsers);
