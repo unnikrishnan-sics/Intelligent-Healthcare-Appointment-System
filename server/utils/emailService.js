@@ -72,6 +72,28 @@ const sendReminder = async (user, appointment) => {
     return sendEmail({ to: user.email, subject, html });
 };
 
+const sendDayBeforeReminder = async (user, appointment) => {
+    const subject = `Upcoming Appointment Tomorrow - Token #${appointment.tokenNumber}`;
+    const html = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #2563eb;">Appointment Reminder</h2>
+            <p>Dear <strong>${user.name}</strong>,</p>
+            <p>This is a reminder that you have an appointment scheduled for tomorrow.</p>
+            
+            <div style="background: #eff6ff; padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid #bfdbfe;">
+                 <p><strong>Date:</strong> ${new Date(appointment.date).toDateString()}</p>
+                 <p><strong>Time:</strong> ${appointment.timeSlot}</p>
+                 <p><strong>Token Number:</strong> #${appointment.tokenNumber}</p>
+            </div>
+
+            <p>If you need to reschedule or cancel, please do so from your dashboard.</p>
+            <p>Thank you for using IHAS.</p>
+        </div>
+    `;
+
+    return sendEmail({ to: user.email, subject, html });
+};
+
 const sendPasswordReset = async (user, resetUrl) => {
     const subject = 'Password Reset Request';
     const html = `
@@ -94,5 +116,6 @@ module.exports = {
     sendEmail,
     sendBookingReceipt,
     sendReminder,
+    sendDayBeforeReminder,
     sendPasswordReset
 };

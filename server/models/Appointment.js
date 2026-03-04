@@ -75,7 +75,8 @@ const appointmentSchema = new mongoose.Schema({
     },
     razorpayOrderId: { type: String },
     razorpayPaymentId: { type: String },
-    reminded: { type: Boolean, default: false }
+    reminded: { type: Boolean, default: false },
+    dayBeforeReminded: { type: Boolean, default: false }
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
