@@ -3,6 +3,7 @@ const Doctor = require('../models/Doctor');
 const bcrypt = require('bcryptjs');
 const Appointment = require('../models/Appointment');
 const mongoose = require('mongoose');
+const Setting = require('../models/Setting');
 
 // @desc    Get all users (with filtering)
 // @route   GET /api/admin/users
@@ -261,6 +262,49 @@ const updateDoctorProfileAdmin = async (req, res) => {
     }
 };
 
+// @desc    Get System Settings
+// @route   GET /api/admin/settings
+// @access  Private/Admin
+const getSettings = async (req, res) => {
+    try {
+        let settings = await Setting.findOne({});
+        if (!settings) {
+            settings = await Setting.create({});
+        }
+        res.json(settings);
+    } catch (error) {
+        console.error('Get Settings Error:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    Update System Settings
+// @route   PUT /api/admin/settings
+// @access  Private/Admin
+const updateSettings = async (req, res) => {
+    try {
+        const { theme, hospitalName, contactEmail, contactPhone, reminderHours } = req.body;
+
+        let settings = await Setting.findOne({});
+        if (settings) {
+            if (theme) settings.theme = { ...settings.theme, ...theme };
+            if (hospitalName) settings.hospitalName = hospitalName;
+            if (contactEmail) settings.contactEmail = contactEmail;
+            if (contactPhone) settings.contactPhone = contactPhone;
+            if (reminderHours !== undefined) settings.reminderHours = reminderHours;
+            settings.updatedAt = Date.now();
+            await settings.save();
+        } else {
+            settings = await Setting.create(req.body);
+        }
+
+        res.json(settings);
+    } catch (error) {
+        console.error('Update Settings Error:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
 module.exports = {
     getAllUsers,
     updateUserStatus,
@@ -270,7 +314,9 @@ module.exports = {
     getReports,
     getDoctorPatients,
     getExportAppointments,
-    updateDoctorProfileAdmin
+    updateDoctorProfileAdmin,
+    getSettings,
+    updateSettings
 };
 
 

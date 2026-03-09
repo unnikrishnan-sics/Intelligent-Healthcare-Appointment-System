@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTheme } from '../../context/ThemeContext';
 import { Search, User, Phone, Mail, Calendar, Clock, ChevronRight } from 'lucide-react';
+import PatientHistoryModal from '../../components/doctor/PatientHistoryModal';
 
 const DoctorPatients = () => {
     const [patients, setPatients] = useState([]);
@@ -26,31 +27,6 @@ const DoctorPatients = () => {
     }, []);
 
     const [selectedPatient, setSelectedPatient] = useState(null);
-    const [history, setHistory] = useState([]);
-    const [loadingHistory, setLoadingHistory] = useState(false);
-
-    // Fetch history when patient is selected
-    useEffect(() => {
-        if (selectedPatient) {
-            const fetchHistory = async () => {
-                setLoadingHistory(true);
-                try {
-                    const token = localStorage.getItem('token');
-                    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/doctors/patients/${selectedPatient._id}/history`, {
-                        headers: { Authorization: `Bearer ${token}` }
-                    });
-                    setHistory(res.data);
-                } catch (error) {
-                    console.error("Error fetching history", error);
-                } finally {
-                    setLoadingHistory(false);
-                }
-            };
-            fetchHistory();
-        } else {
-            setHistory([]);
-        }
-    }, [selectedPatient]);
 
     const filteredPatients = patients.filter(patient =>
         patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -158,63 +134,10 @@ const DoctorPatients = () => {
 
             {/* Patient History Modal */}
             {selectedPatient && (
-                <div className="fixed inset-0 z-[9999] w-screen h-screen flex items-center justify-center p-4 animate-fade-in backdrop-blur-md bg-white/30">
-                    <div className="bg-white/80 backdrop-blur-xl rounded-3xl w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-[0_8px_32px_rgba(0,0,0,0.1)] border border-white/50">
-                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-white/40">
-                            <div className="flex items-center gap-4">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold`} style={{ backgroundColor: theme.primaryColor }}>
-                                    {selectedPatient.name.charAt(0).toUpperCase()}
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-gray-800">{selectedPatient.name}</h3>
-                                    <p className="text-xs text-gray-500">Medical History</p>
-                                </div>
-                            </div>
-                            <button onClick={() => setSelectedPatient(null)} className="p-2 hover:bg-gray-200 rounded-full">
-                                <ChevronRight className="rotate-90" size={20} />
-                            </button>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                            {loadingHistory ? (
-                                <div className="text-center py-10">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                                </div>
-                            ) : history.length === 0 ? (
-                                <div className="text-center text-gray-400 py-10">
-                                    No history records found.
-                                </div>
-                            ) : (
-                                history.map((record) => (
-                                    <div key={record._id} className="border rounded-xl p-4 hover:shadow-md transition-shadow">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <div>
-                                                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded mb-1 inline-block">
-                                                    {record.queueStatus || 'Completed'}
-                                                </span>
-                                                <p className="font-semibold text-gray-800">{new Date(record.date).toLocaleDateString()} • {record.timeSlot}</p>
-                                            </div>
-                                            {record.tokenNumber && <span className="text-sm font-bold text-gray-400">#{record.tokenNumber}</span>}
-                                        </div>
-                                        {record.reason && (
-                                            <div className="text-sm text-gray-600 mt-2">
-                                                <span className="font-medium text-gray-700">Reason:</span> {record.reason}
-                                            </div>
-                                        )}
-                                        {/* Placeholder for Prescriptions if they were populated */}
-                                        {/* <button className="mt-3 text-sm text-blue-600 font-medium hover:underline">View Prescription</button> */}
-                                    </div>
-                                ))
-                            )}
-                        </div>
-
-                        <div className="p-4 border-t bg-gray-50 text-right">
-                            <button onClick={() => setSelectedPatient(null)} className="px-4 py-2 bg-white border rounded-lg text-sm font-medium hover:bg-gray-100">
-                                Close
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <PatientHistoryModal
+                    patient={selectedPatient}
+                    onClose={() => setSelectedPatient(null)}
+                />
             )}
         </div>
     );

@@ -11,6 +11,7 @@ const settingSchema = new mongoose.Schema({
     hospitalName: { type: String, default: 'IHAS Healthcare' },
     contactEmail: { type: String, default: 'admin@ihas.com' },
     contactPhone: { type: String, default: '' },
+    reminderHours: { type: Number, default: 10 },
     updatedAt: {
         type: Date,
         default: Date.now

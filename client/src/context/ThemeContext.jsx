@@ -9,7 +9,8 @@ export const ThemeProvider = ({ children }) => {
         secondaryColor: '#64748b',
         accentColor: '#f43f5e',
         logoUrl: '',
-        hospitalName: 'IHAS Healthcare'
+        hospitalName: 'IHAS Healthcare',
+        reminderHours: 10
     });
 
     const [loading, setLoading] = useState(true);
@@ -27,18 +28,28 @@ export const ThemeProvider = ({ children }) => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                // Mock fetch or real fetch
-                // const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/settings`);
-                // if(res.data) {
-                //      setTheme(res.data.theme);
-                //      applyTheme(res.data.theme);
-                // }
-
-                // For now, apply default
-                applyTheme(theme);
+                const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
+                const config = {
+                    headers: {
+                        'Authorization': `Bearer ${userInfo ? userInfo.token : ''}`
+                    }
+                };
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/admin/settings`, config);
+                if (res.data) {
+                    const settingsData = {
+                        ...res.data.theme,
+                        hospitalName: res.data.hospitalName,
+                        reminderHours: res.data.reminderHours
+                    };
+                    setTheme(settingsData);
+                    applyTheme(res.data.theme);
+                } else {
+                    applyTheme(theme);
+                }
                 setLoading(false);
             } catch (error) {
                 console.error("Failed to load theme", error);
+                applyTheme(theme);
                 setLoading(false);
             }
         };

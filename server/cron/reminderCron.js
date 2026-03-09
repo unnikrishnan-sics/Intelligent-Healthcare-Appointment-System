@@ -1,6 +1,7 @@
 const cron = require('node-cron');
 const Appointment = require('../models/Appointment');
 const User = require('../models/User');
+const Setting = require('../models/Setting');
 const { sendReminder, sendDayBeforeReminder } = require('../utils/emailService');
 
 const startReminderJob = () => {
@@ -34,7 +35,10 @@ const startReminderJob = () => {
                 }
             }
 
-            // 2. Handle "3 Hours Before" Reminders (Existing Logic)
+            // 2. Handle Dynamic Before Reminder (Admin configurable)
+            let settings = await Setting.findOne({});
+            const reminderHoursLimit = settings ? settings.reminderHours : 10;
+
             const recentAppointments = await Appointment.find({
                 status: { $in: ['Confirmed', 'Pending'] },
                 reminded: false
@@ -49,9 +53,9 @@ const startReminderJob = () => {
                 const diffMs = aptDateTime - now;
                 const matchHours = diffMs / (1000 * 60 * 60);
 
-                // If appointment is roughly 3 hours away (between 2.8 and 3.2 hours)
-                if (matchHours >= 2.8 && matchHours <= 3.2) {
-                    console.log(`Sending 3hr reminder for Apt #${apt.tokenNumber}`);
+                // If appointment is roughly reminderHoursLimit away (between -0.2 and +0.2 tolerance)
+                if (matchHours >= (reminderHoursLimit - 0.2) && matchHours <= (reminderHoursLimit + 0.2)) {
+                    console.log(`Sending ${reminderHoursLimit}hr reminder for Apt #${apt.tokenNumber}`);
                     if (apt.patientId && apt.patientId.email) {
                         await sendReminder(apt.patientId, apt);
                         apt.reminded = true;

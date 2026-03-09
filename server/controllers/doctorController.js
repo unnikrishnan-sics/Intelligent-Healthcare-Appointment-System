@@ -285,7 +285,10 @@ const getPatientHistory = async (req, res) => {
         const history = await require('../models/Appointment').find({
             doctorId: req.user.id,
             patientId: patientId
-        }).populate('patientId', 'name email').sort({ date: -1 });
+        })
+            .populate('patientId', 'name email')
+            .populate('prescriptions') // Populate virtual prescriptions
+            .sort({ date: -1 });
 
         res.json(history);
     } catch (error) {

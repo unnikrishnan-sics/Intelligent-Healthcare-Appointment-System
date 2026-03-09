@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Play, Pause, AlertCircle, RefreshCw, CheckCircle, SkipForward, FileText } from 'lucide-react';
+import { Play, Pause, AlertCircle, RefreshCw, CheckCircle, SkipForward, FileText, History } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import PrescriptionModal from './PrescriptionModal';
+import PatientHistoryModal from './PatientHistoryModal';
 
 const DoctorQueuePanel = ({ user }) => {
     const { theme } = useTheme();
@@ -11,6 +12,7 @@ const DoctorQueuePanel = ({ user }) => {
     const [loading, setLoading] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
     const [showPrescribeModal, setShowPrescribeModal] = useState(false);
+    const [showHistoryModal, setShowHistoryModal] = useState(false);
 
     const fetchQueue = async () => {
         try {
@@ -121,6 +123,12 @@ const DoctorQueuePanel = ({ user }) => {
                             </div>
                             <div className="flex gap-3">
                                 <button
+                                    onClick={() => setShowHistoryModal(true)}
+                                    className="px-5 py-2 bg-blue-100 text-blue-700 font-bold rounded-lg shadow-sm hover:bg-blue-200 transition flex items-center gap-2"
+                                >
+                                    <History size={18} /> History
+                                </button>
+                                <button
                                     onClick={() => setShowPrescribeModal(true)}
                                     disabled={actionLoading}
                                     className="px-5 py-2 bg-purple-600 text-white font-bold rounded-lg shadow hover:bg-purple-700 transition flex items-center gap-2"
@@ -207,6 +215,12 @@ const DoctorQueuePanel = ({ user }) => {
                             // Optionally auto-complete or refresh queue
                             fetchQueue();
                         }}
+                    />
+                )}
+                {showHistoryModal && currentPatient && (
+                    <PatientHistoryModal
+                        patient={currentPatient.patientId}
+                        onClose={() => setShowHistoryModal(false)}
                     />
                 )}
             </div>
