@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
-import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, FileText } from 'lucide-react';
+import { Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, FileText, History } from 'lucide-react';
 import PrescriptionModal from '../../components/doctor/PrescriptionModal';
+import PatientHistoryModal from '../../components/doctor/PatientHistoryModal';
 import toast from 'react-hot-toast';
 
 const Appointments = () => {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [selectedPatientForHistory, setSelectedPatientForHistory] = useState(null);
     const { theme } = useTheme();
     const { user } = useAuth();
 
@@ -160,6 +162,14 @@ const Appointments = () => {
                                         >
                                             <FileText size={16} /> Prescribe
                                         </button>
+                                        {apt.status === 'Completed' && (
+                                            <button
+                                                onClick={() => setSelectedPatientForHistory(apt.patientId)}
+                                                className="px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                                            >
+                                                <History size={16} /> History
+                                            </button>
+                                        )}
                                         <button
                                             onClick={() => handleStatusUpdate(apt._id, 'Cancelled')}
                                             className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
@@ -191,6 +201,12 @@ const Appointments = () => {
                                                 >
                                                     <FileText size={16} /> Prescription
                                                 </button>
+                                                <button
+                                                    onClick={() => setSelectedPatientForHistory(user)}
+                                                    className="px-4 py-2 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                                                >
+                                                    <History size={16} /> My History
+                                                </button>
                                             </div>
                                         )}
                                     </>
@@ -212,7 +228,15 @@ const Appointments = () => {
                     />
                 )
             }
-        </div >
+            {
+                selectedPatientForHistory && (
+                    <PatientHistoryModal
+                        patient={selectedPatientForHistory}
+                        onClose={() => setSelectedPatientForHistory(null)}
+                    />
+                )
+            }
+        </div>
     );
 };
 

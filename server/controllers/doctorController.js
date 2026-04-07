@@ -277,17 +277,30 @@ const getDoctorPatients = async (req, res) => {
 
 // @desc    Get detailed history of a patient
 // @route   GET /api/doctors/patients/:patientId/history
-// @access  Private (Doctor)
+// @access  Private (Doctor, Admin, Patient)
 const getPatientHistory = async (req, res) => {
     try {
         const { patientId } = req.params;
-        // Simple find works here because mongoose casts string ID for find()
-        const history = await require('../models/Appointment').find({
-            doctorId: req.user.id,
-            patientId: patientId
-        })
+        const query = { patientId };
+
+        // If user is a doctor, they can only see history with them specifically
+        // UNLESS we want doctors to see all history (often they do for clinical context)
+        // For now, let's allow Admin to see everything and Doctor to see their own
+        if (req.user.role === 'doctor') {
+            query.doctorId = req.user.id;
+        } else if (req.user.role === 'admin') {
+            // Admin sees all history for this patient
+        } else if (req.user.role === 'patient') {
+            // Patient can only see their own history
+            if (req.user.id !== patientId) {
+                return res.status(401).json({ message: 'Not authorized to view this history' });
+            }
+        }
+
+        const history = await require('../models/Appointment').find(query)
             .populate('patientId', 'name email')
-            .populate('prescriptions') // Populate virtual prescriptions
+            .populate('doctorId', 'name email specialization') // Added doctor info since Admin/Patient sees multiple doctors
+            .populate('prescriptions')
             .sort({ date: -1 });
 
         res.json(history);

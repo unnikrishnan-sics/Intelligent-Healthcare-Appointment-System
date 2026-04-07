@@ -7,7 +7,7 @@ router.get('/', getDoctors);
 router.post('/profile', protect, doctor, updateDoctorProfile);
 router.get('/profile', protect, doctor, getDoctorProfile);
 router.get('/patients', protect, doctor, getDoctorPatients);
-router.get('/patients/:patientId/history', protect, doctor, getPatientHistory);
+router.get('/patients/:patientId/history', protect, getPatientHistory);
 router.get('/:id', getDoctorById);
 
 module.exports = router;

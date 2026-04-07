@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTheme } from '../../context/ThemeContext';
-import { Calendar, Search, User, FileText, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { Calendar, Search, User, FileText, CheckCircle, XCircle, Clock, History } from 'lucide-react';
 import PrescriptionModal from '../../components/doctor/PrescriptionModal';
+import PatientHistoryModal from '../../components/doctor/PatientHistoryModal';
 
 const AdminAppointments = () => {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [selectedPatientForHistory, setSelectedPatientForHistory] = useState(null);
     const { theme } = useTheme();
 
     useEffect(() => {
@@ -107,12 +109,20 @@ const AdminAppointments = () => {
                                 </td>
                                 <td className="p-4">
                                     {apt.status === 'Completed' && (
-                                        <button
-                                            onClick={() => setSelectedAppointment(apt)}
-                                            className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1"
-                                        >
-                                            <FileText size={16} /> View Rx
-                                        </button>
+                                        <div className="flex flex-col gap-1">
+                                            <button
+                                                onClick={() => setSelectedAppointment(apt)}
+                                                className="text-blue-600 hover:text-blue-800 text-xs font-semibold flex items-center gap-1"
+                                            >
+                                                <FileText size={14} /> View Rx
+                                            </button>
+                                            <button
+                                                onClick={() => setSelectedPatientForHistory(apt.patientId)}
+                                                className="text-purple-600 hover:text-purple-800 text-xs font-semibold flex items-center gap-1"
+                                            >
+                                                <History size={14} /> View History
+                                            </button>
+                                        </div>
                                     )}
                                 </td>
                             </tr>
@@ -129,6 +139,13 @@ const AdminAppointments = () => {
                     appointment={selectedAppointment}
                     onClose={() => setSelectedAppointment(null)}
                     onSuccess={() => { }} // Read only mainly
+                />
+            )}
+
+            {selectedPatientForHistory && (
+                <PatientHistoryModal
+                    patient={selectedPatientForHistory}
+                    onClose={() => setSelectedPatientForHistory(null)}
                 />
             )}
         </div>
