@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Clock } from 'lucide-react';
+import { Search, MapPin, Clock, Briefcase, ChevronRight } from 'lucide-react';
 import BookingModal from '../../components/appointments/BookingModal';
 import toast from 'react-hot-toast';
 

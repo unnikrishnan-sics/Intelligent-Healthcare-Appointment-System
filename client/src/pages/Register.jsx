@@ -17,6 +17,7 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const { register } = useAuth();
     const { theme } = useTheme();
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {

@@ -13,7 +13,7 @@ router.put('/users/:id/status', protect, admin, updateUserStatus);
 router.delete('/users/:id', protect, admin, deleteUser);
 router.post('/doctors', protect, admin, addDoctor);
 router.put('/doctors/:id/profile', protect, admin, updateDoctorProfileAdmin);
-router.get('/settings', protect, admin, getSettings);
+router.get('/settings', getSettings);
 router.put('/settings', protect, admin, updateSettings);
 
 
